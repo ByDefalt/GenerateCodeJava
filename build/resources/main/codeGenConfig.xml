@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java-code>
+    <!-- Mappings des modèles minispec vers packages Java -->
+    <model name="Meuble" package="m2tiil.meuble"/>
+    <model name="Bataille" package="m2tiil.batailleNavale"/>
+    <model name="Satellite" package="m2tiil.satellite"/>
+    <model name="ExempleMeuble" package="m2tiil.meuble"/>
+    <model name="SatelliteSystem" package="m2tiil.satellite"/>
+
+    <!-- Mappings des types primitifs -->
+    <!-- Types de base Java (pas d'import nécessaire) -->
+    <primitive name="String" type="String"/>
+    <primitive name="Integer" type="Integer"/>
+    <primitive name="Double" type="Double"/>
+    <primitive name="Boolean" type="Boolean"/>
+    <primitive name="Long" type="Long"/>
+    <primitive name="Float" type="Float"/>
+
+    <!-- Collections Java standard -->
+    <primitive name="List" type="ArrayList" package="java.util.ArrayList"/>
+    <primitive name="Set" type="HashSet" package="java.util.HashSet"/>
+    <primitive name="Map" type="HashMap" package="java.util.HashMap"/>
+
+    <!-- Collections personnalisées -->
+    <primitive name="Array" type="Array" package="m2tiil.Array"/>
+    <primitive name="Bag" type="Bag" package="m2tiil.Bag"/>
+</java-code>
