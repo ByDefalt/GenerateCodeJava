@@ -1,9 +1,10 @@
 package metaModel;
 
 
-public class Visitor {
+public abstract class Visitor {
 	
-	public void visitModel(Model e) {}
-	public void visitEntity(Entity e) {}
+	public abstract void visitModel(Model e);
+	public abstract void visitEntity(Entity e);
+	public abstract void visitAttribute(Attribute e);
 
 }

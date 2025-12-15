@@ -1,0 +1,6 @@
+<Root model="#1">
+    <Model id="#1" />
+    <Entity id="#2" model="#1" name="Satellite" />
+    <Attribute id="#3" entity="#2" name="nom" type="String" />
+    <Attribute id="#4" entity="#2" name="id" type="Integer" />
+</Root>

@@ -1,5 +1,5 @@
 package metaModel;
 
-public interface MinispecElement {
+public interface MinispecElement extends Visitable {
 
 }
