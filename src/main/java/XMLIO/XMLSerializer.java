@@ -99,6 +99,13 @@ public class XMLSerializer extends Visitor {
         attr.setValue(a.getName());
         elem.setAttributeNode(attr);
 
+        // Ajouter la valeur initiale si présente
+        if (a.hasInitialValue()) {
+            attr = doc.createAttribute("init");
+            attr.setValue(a.getInitialValue());
+            elem.setAttributeNode(attr);
+        }
+
         // Sérialiser le type
         Type type = a.getType();
         if (!type.isCollection()) {

@@ -61,8 +61,15 @@ public class XMLAnalyser {
 
     protected Attribute attributeFromElement(Element e) {
         String name = e.getAttribute("name");
+        String initialValue = e.getAttribute("init");
         Type type = parseType(e);
-        Attribute attribute = new Attribute(name, type);
+
+        Attribute attribute;
+        if (initialValue != null && !initialValue.isEmpty()) {
+            attribute = new Attribute(name, type, initialValue);
+        } else {
+            attribute = new Attribute(name, type);
+        }
 
         // Ajouter l'attribut à l'entité parente
         Element entityElement = this.xmlElementIndex.get(e.getAttribute("entity"));

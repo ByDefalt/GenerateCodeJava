@@ -105,8 +105,12 @@ public class JavaVisitor extends Visitor {
         String javaType = currentJavaType;
         Type type = e.getType();
 
-        // Ajouter l'attribut (variable d'instance)
-        resultBuffer += "    private " + javaType + " " + e.getName() + ";\n";
+        // Ajouter l'attribut (variable d'instance) avec valeur initiale si présente
+        resultBuffer += "    private " + javaType + " " + e.getName();
+        if (e.hasInitialValue()) {
+            resultBuffer += " = " + e.getInitialValue();
+        }
+        resultBuffer += ";\n";
 
         // Générer les getters et setters
         String capitalizedName = e.getName().substring(0, 1).toUpperCase() + e.getName().substring(1);

@@ -57,7 +57,14 @@ public class PrettyPrinter extends Visitor {
         currentTypeString = "";
         e.getType().accept(this);
 
-        result = result + "    " + e.getName() + " : " + currentTypeString + " ;\n";
+        result = result + "    " + e.getName() + " : " + currentTypeString;
+
+        // Ajouter la valeur initiale si présente
+        if (e.hasInitialValue()) {
+            result = result + " := " + e.getInitialValue();
+        }
+
+        result = result + " ;\n";
     }
 
     @Override
