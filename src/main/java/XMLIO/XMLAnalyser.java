@@ -27,7 +27,7 @@ public class XMLAnalyser {
     }
 
     protected Model modelFromElement(Element e) {
-        return new Model();
+        return new Model(e.getAttribute("name"));
     }
 
     protected Entity entityFromElement(Element e) {
@@ -50,7 +50,7 @@ public class XMLAnalyser {
 
     protected Attribute attributeFromElement(Element e) {
         String name = e.getAttribute("name");
-        String type = e.getAttribute("type");
+        Type type = parseType(e);
         Attribute attribute = new Attribute(name, type);
 
         // Ajouter l'attribut à l'entité parente
@@ -63,6 +63,50 @@ public class XMLAnalyser {
         }
 
         return attribute;
+    }
+
+    /**
+     * Parse le type depuis un élément XML Attribute
+     * Supporte:
+     * - Types simples: <attribute name="nom" type="String"/>
+     * - Références: <attribute name="parent" type="Flotte"/>
+     * - Collections: <attribute name="satellites" type="List" of="Satellite"/>
+     * - Collections avec cardinalités: <attribute name="satellites" type="List" of="Satellite" min="1" max="10"/>
+     * - Arrays: <attribute name="panneaux" type="Array" of="PanneauSolaire" size="2"/>
+     */
+    protected Type parseType(Element e) {
+        String typeStr = e.getAttribute("type");
+        String ofType = e.getAttribute("of");
+
+        // Type simple ou référence à une entité
+        if (ofType == null || ofType.isEmpty()) {
+            return new Type(typeStr);
+        }
+
+        // C'est une collection
+        String collectionType = typeStr; // List, Set, Bag, Array
+
+        // Array avec taille fixe
+        if ("Array".equals(collectionType)) {
+            String sizeStr = e.getAttribute("size");
+            if (sizeStr != null && !sizeStr.isEmpty()) {
+                Integer size = Integer.parseInt(sizeStr);
+                return new Type(ofType, size);
+            }
+        }
+
+        // Collection avec cardinalités
+        String minStr = e.getAttribute("min");
+        String maxStr = e.getAttribute("max");
+
+        if ((minStr != null && !minStr.isEmpty()) || (maxStr != null && !maxStr.isEmpty())) {
+            Integer min = (minStr != null && !minStr.isEmpty()) ? Integer.parseInt(minStr) : null;
+            Integer max = (maxStr != null && !maxStr.isEmpty()) ? Integer.parseInt(maxStr) : null;
+            return new Type(ofType, collectionType, min, max);
+        }
+
+        // Collection simple sans cardinalités
+        return new Type(ofType, collectionType);
     }
 
     protected MinispecElement minispecElementFromXmlElement(Element e) {

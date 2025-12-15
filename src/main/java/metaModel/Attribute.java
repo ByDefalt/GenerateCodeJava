@@ -1,10 +1,17 @@
 package metaModel;
 
 public class Attribute implements MinispecElement {
-    String name;
-    String type;
+    private String name;
+    private Type type;
 
-    public Attribute(String name, String type) {
+    // Constructeur avec String (pour compatibilité)
+    public Attribute(String name, String typeStr) {
+        this.name = name;
+        this.type = new Type(typeStr);
+    }
+
+    // Constructeur avec Type
+    public Attribute(String name, Type type) {
         this.name = name;
         this.type = type;
     }
@@ -17,12 +24,17 @@ public class Attribute implements MinispecElement {
         this.name = name;
     }
 
-    public String getType() {
+    public Type getType() {
         return type;
     }
 
-    public void setType(String value) {
-        this.type = value;
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    // Pour compatibilité avec l'ancien code
+    public void setType(String typeStr) {
+        this.type = new Type(typeStr);
     }
 
     @Override

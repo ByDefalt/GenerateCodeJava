@@ -6,5 +6,6 @@ public abstract class Visitor {
 	public abstract void visitModel(Model e);
 	public abstract void visitEntity(Entity e);
 	public abstract void visitAttribute(Attribute e);
+    public abstract void visitType(Type e);
 
 }
