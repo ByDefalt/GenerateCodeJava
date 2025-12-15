@@ -69,6 +69,13 @@ public class XMLSerializer extends Visitor {
         attr.setValue(e.getName().toString());
         elem.setAttributeNode(attr);
 
+        // Ajouter l'attribut supertype si présent
+        if (e.hasSuperType()) {
+            attr = doc.createAttribute("supertype");
+            attr.setValue(e.getSuperType());
+            elem.setAttributeNode(attr);
+        }
+
         this.root.appendChild(elem);
         elements.add(elem);
 
@@ -149,6 +156,14 @@ public class XMLSerializer extends Visitor {
         Element elem = this.doc.createElement("Model");
         this.addIdToElement(elem);
         this.maybeUpdateRootFrom(elem);
+
+        // Ajouter l'attribut name sur Root si le modèle a un nom
+        if (e.getName() != null && !e.getName().isEmpty()) {
+            Attr attr = doc.createAttribute("name");
+            attr.setValue(e.getName());
+            this.root.setAttributeNode(attr);
+        }
+
         this.root.appendChild(elem);
         elements.add(elem);
         for (Entity n : e.getEntities()) {

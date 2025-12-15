@@ -43,7 +43,12 @@ public class JavaVisitor extends Visitor {
             classBuffer.append("\n");
         }
 
-        classBuffer.append("public class ").append(e.getName()).append(" {\n");
+        // Déclaration de la classe avec héritage si présent
+        classBuffer.append("public class ").append(e.getName());
+        if (e.hasSuperType()) {
+            classBuffer.append(" extends ").append(e.getSuperType());
+        }
+        classBuffer.append(" {\n");
 
         // Visiter les attributs (ils seront ajoutés à attributesBuffer temporairement)
         if (e.getAttributes() != null) {

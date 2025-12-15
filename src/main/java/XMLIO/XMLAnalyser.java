@@ -27,13 +27,24 @@ public class XMLAnalyser {
     }
 
     protected Model modelFromElement(Element e) {
-        return new Model(e.getAttribute("name"));
+        Model model = new Model();
+        String name = e.getAttribute("name");
+        if (name != null && !name.isEmpty()) {
+            model.setName(name);
+        }
+        return model;
     }
 
     protected Entity entityFromElement(Element e) {
         String name = e.getAttribute("name");
+        String superType = e.getAttribute("supertype");
+
         Entity entity = new Entity();
         entity.setName(name);
+
+        if (superType != null && !superType.isEmpty()) {
+            entity.setSuperType(superType);
+        }
 
         // Initialiser la liste d'attributs
         entity.setAttributes(new ArrayList<>());
@@ -165,6 +176,14 @@ public class XMLAnalyser {
         secondRound(e);
 
         Model model = (Model) this.minispecIndex.get(e.getAttribute("model"));
+
+        // Récupérer le nom depuis l'élément Root
+        if (model != null) {
+            String name = e.getAttribute("name");
+            if (name != null && !name.isEmpty()) {
+                model.setName(name);
+            }
+        }
 
         return model;
     }

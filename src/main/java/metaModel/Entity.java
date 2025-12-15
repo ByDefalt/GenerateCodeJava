@@ -5,6 +5,7 @@ import java.util.List;
 public class Entity implements MinispecElement {
 	private String name;
 	private List<Attribute> attributes;
+    private String superType;
 	
 	public String getName() {
 		return name;
@@ -25,4 +26,17 @@ public class Entity implements MinispecElement {
 	public void setAttributes(List<Attribute> attributes) {
 		this.attributes = attributes;
 	}
+
+
+    public String getSuperType() {
+        return superType;
+    }
+
+    public void setSuperType(String superType) {
+        this.superType = superType;
+    }
+
+    public boolean hasSuperType() {
+        return superType != null && !superType.isEmpty();
+    }
 }

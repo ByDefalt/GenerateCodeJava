@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root model="#1" name="ExempleDefinitionMultiple">
+    <Model id="#1" />
+
+    <!-- Meuble avec attribut 'nom' -->
+    <Entity id="#2" model="#1" name="Meuble" />
+    <Attribute id="#3" entity="#2" name="nom" type="String" />
+    <Attribute id="#4" entity="#2" name="prix" type="Double" />
+
+    <!-- Erreur: Chaise hérite de Meuble et redéfinit l'attribut 'nom' -->
+    <Entity id="#5" model="#1" name="Chaise" supertype="Meuble" />
+    <Attribute id="#6" entity="#5" name="nom" type="String" />
+    <Attribute id="#7" entity="#5" name="nbPieds" type="Integer" />
+</Root>
