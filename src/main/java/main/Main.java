@@ -1,9 +1,9 @@
 package main;
 
-import xmlio.XMLAnalyser;
 import metaModel.Model;
 import prettyPrinter.PrettyPrinter;
 import visitor.JavaVisitor;
+import xmlio.metaModelCreator.XMLAnalyser;
 
 public class Main {
     public static void main(String[] args){
