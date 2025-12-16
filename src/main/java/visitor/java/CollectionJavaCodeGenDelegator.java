@@ -4,6 +4,7 @@ import metaModel.Attribute;
 import metaModel.types.*;
 import visitor.CodeGenDelegator;
 import visitor.CodeGenVisitor;
+import visitor.Context;
 import visitor.Visitor;
 
 public class CollectionJavaCodeGenDelegator implements CodeGenDelegator {

@@ -4,6 +4,7 @@ import metaModel.Attribute;
 import metaModel.Entity;
 import visitor.CodeGenDelegator;
 import visitor.CodeGenVisitor;
+import visitor.Context;
 import visitor.Visitor;
 
 public class EntityJavaCodeGenDelegator implements CodeGenDelegator {

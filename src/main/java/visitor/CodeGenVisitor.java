@@ -2,7 +2,6 @@ package visitor;
 
 import metaModel.*;
 import metaModel.types.*;
-import visitor.java.*;
 
 public class CodeGenVisitor extends Visitor {
 

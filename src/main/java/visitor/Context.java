@@ -1,4 +1,4 @@
-package visitor.java;
+package visitor;
 
 public class Context {
     public final StringBuilder result = new StringBuilder();
