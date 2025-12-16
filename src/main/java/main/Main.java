@@ -1,6 +1,6 @@
 package main;
 
-import XMLIO.XMLAnalyser;
+import xmlio.XMLAnalyser;
 import metaModel.Model;
 import prettyPrinter.PrettyPrinter;
 import visitor.JavaVisitor;

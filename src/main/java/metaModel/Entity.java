@@ -1,5 +1,7 @@
 package metaModel;
 
+import visitor.Visitor;
+
 import java.util.List;
 
 public class Entity implements MinispecElement {

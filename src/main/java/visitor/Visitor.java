@@ -1,5 +1,10 @@
-package metaModel;
+package visitor;
 
+
+import metaModel.Attribute;
+import metaModel.Entity;
+import metaModel.Model;
+import metaModel.types.Type;
 
 public abstract class Visitor {
 	

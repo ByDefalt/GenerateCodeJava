@@ -1,4 +1,4 @@
-package XMLIO;
+package xmlio;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,14 +8,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import metaModel.Attribute;
-import metaModel.Type;
+import metaModel.types.Type;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import metaModel.Entity;
 import metaModel.Model;
-import metaModel.Visitor;
+import visitor.Visitor;
 
 public class XMLSerializer extends Visitor {
     List<Element> elements;
@@ -72,7 +72,6 @@ public class XMLSerializer extends Visitor {
         this.root.appendChild(elem);
         elements.add(elem);
 
-        // Visiter les attributs
         if (e.getAttributes() != null) {
             for (Attribute a : e.getAttributes()) {
                 visitAttributeWithEntityId(a, entityId);
@@ -92,15 +91,12 @@ public class XMLSerializer extends Visitor {
         attr.setValue(a.getName());
         elem.setAttributeNode(attr);
 
-        // Sérialiser le type
         Type type = a.getType();
         if (!type.isCollection()) {
-            // Type simple
             attr = doc.createAttribute("type");
             attr.setValue(type.getBaseType());
             elem.setAttributeNode(attr);
         } else {
-            // Collection
             attr = doc.createAttribute("type");
             attr.setValue(type.getCollectionType());
             elem.setAttributeNode(attr);
@@ -109,7 +105,6 @@ public class XMLSerializer extends Visitor {
             attr.setValue(type.getBaseType());
             elem.setAttributeNode(attr);
 
-            // Ajouter cardinalités ou taille
             if ("Array".equals(type.getCollectionType()) && type.getArraySize() != null) {
                 attr = doc.createAttribute("size");
                 attr.setValue(type.getArraySize().toString());
@@ -134,14 +129,10 @@ public class XMLSerializer extends Visitor {
 
     @Override
     public void visitAttribute(Attribute e) {
-        // Cette méthode ne devrait plus être appelée directement
-        // On utilise visitAttributeWithEntityId à la place
     }
 
     @Override
     public void visitType(Type e) {
-        // Le type est sérialisé dans visitAttributeWithEntityId
-        // Cette méthode est présente pour satisfaire l'interface Visitor
     }
 
     @Override

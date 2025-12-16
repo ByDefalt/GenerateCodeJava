@@ -3,12 +3,12 @@ package prettyPrinter;
 import metaModel.Attribute;
 import metaModel.Entity;
 import metaModel.Model;
-import metaModel.Type;
-import metaModel.Visitor;
+import metaModel.types.Type;
+import visitor.Visitor;
 
 public class PrettyPrinter extends Visitor {
     String result = "";
-    String currentTypeString = ""; // Pour stocker temporairement le résultat de visitType
+    String currentTypeString = "";
 
     public String result() {
         return result;

@@ -1,4 +1,4 @@
-package XMLIO;
+package xmlio;
 
 
 import java.io.File;

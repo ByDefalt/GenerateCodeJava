@@ -1,6 +1,8 @@
-package XMLIO;
+package xmlio;
 
 import javax.xml.parsers.*;
+
+import metaModel.types.Type;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 
@@ -14,11 +16,7 @@ import java.util.Map;
 
 public class XMLAnalyser {
 
-    // Les clés des 2 Map sont les id
-
-    // Map des instances de la syntaxe abstraite (metamodel)
     protected Map<String, MinispecElement> minispecIndex;
-    // Map des elements XML
     protected Map<String, Element> xmlElementIndex;
 
     public XMLAnalyser() {
@@ -35,10 +33,8 @@ public class XMLAnalyser {
         Entity entity = new Entity();
         entity.setName(name);
 
-        // Initialiser la liste d'attributs
         entity.setAttributes(new ArrayList<>());
 
-        // Récupérer le modèle parent
         Element modelElement = this.xmlElementIndex.get(e.getAttribute("model"));
         if (modelElement != null) {
             Model model = (Model) minispecElementFromXmlElement(modelElement);
@@ -53,7 +49,6 @@ public class XMLAnalyser {
         Type type = parseType(e);
         Attribute attribute = new Attribute(name, type);
 
-        // Ajouter l'attribut à l'entité parente
         Element entityElement = this.xmlElementIndex.get(e.getAttribute("entity"));
         if (entityElement != null) {
             Entity entity = (Entity) minispecElementFromXmlElement(entityElement);
@@ -65,28 +60,16 @@ public class XMLAnalyser {
         return attribute;
     }
 
-    /**
-     * Parse le type depuis un élément XML Attribute
-     * Supporte:
-     * - Types simples: <attribute name="nom" type="String"/>
-     * - Références: <attribute name="parent" type="Flotte"/>
-     * - Collections: <attribute name="satellites" type="List" of="Satellite"/>
-     * - Collections avec cardinalités: <attribute name="satellites" type="List" of="Satellite" min="1" max="10"/>
-     * - Arrays: <attribute name="panneaux" type="Array" of="PanneauSolaire" size="2"/>
-     */
     protected Type parseType(Element e) {
         String typeStr = e.getAttribute("type");
         String ofType = e.getAttribute("of");
 
-        // Type simple ou référence à une entité
         if (ofType == null || ofType.isEmpty()) {
             return new Type(typeStr);
         }
 
-        // C'est une collection
-        String collectionType = typeStr; // List, Set, Bag, Array
+        String collectionType = typeStr;
 
-        // Array avec taille fixe
         if ("Array".equals(collectionType)) {
             String sizeStr = e.getAttribute("size");
             if (sizeStr != null && !sizeStr.isEmpty()) {
@@ -95,7 +78,6 @@ public class XMLAnalyser {
             }
         }
 
-        // Collection avec cardinalités
         String minStr = e.getAttribute("min");
         String maxStr = e.getAttribute("max");
 
@@ -105,7 +87,6 @@ public class XMLAnalyser {
             return new Type(ofType, collectionType, min, max);
         }
 
-        // Collection simple sans cardinalités
         return new Type(ofType, collectionType);
     }
 
@@ -133,7 +114,6 @@ public class XMLAnalyser {
         return result;
     }
 
-    // alimentation du map des elements XML
     protected void firstRound(Element el) {
         NodeList nodes = el.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -146,7 +126,6 @@ public class XMLAnalyser {
         }
     }
 
-    // alimentation du map des instances de la syntaxe abstraite (metamodel)
     protected void secondRound(Element el) {
         NodeList nodes = el.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -171,10 +150,8 @@ public class XMLAnalyser {
 
     public Model getModelFromInputStream(InputStream stream) {
         try {
-            // création d'une fabrique de documents
             DocumentBuilderFactory fabrique = DocumentBuilderFactory.newInstance();
 
-            // création d'un constructeur de documents
             DocumentBuilder constructeur = fabrique.newDocumentBuilder();
             Document document = constructeur.parse(stream);
             return getModelFromDocument(document);
