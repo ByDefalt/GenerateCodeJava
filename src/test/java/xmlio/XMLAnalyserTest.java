@@ -3,6 +3,7 @@ package xmlio;
 
 
 
+import metaModel.types.ArrayType;
 import org.junit.jupiter.api.Test;
 
 import metaModel.Model;
@@ -47,7 +48,7 @@ class XMLAnalyserTest {
 		assertEquals("Flotte", model.getEntities().get(0).getName());
 		assertEquals("Satellite", model.getEntities().get(1).getName());
 		assertEquals("PanneauSolaire", model.getEntities().get(2).getName());
-		assertEquals("Array", model.getEntities().get(1).getAttributes().get(3).getType().getCollectionType());
+		assertTrue(model.getEntities().get(1).getAttributes().get(3).getType() instanceof ArrayType);
 	}
 	
 	@Test

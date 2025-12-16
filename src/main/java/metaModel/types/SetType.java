@@ -2,18 +2,18 @@ package metaModel.types;
 
 import visitor.Visitor;
 
-public class ListType extends CollectionType {
+public class SetType extends CollectionType {
 
-    public ListType(Type elementType) {
+    public SetType(Type elementType) {
         super(elementType);
     }
 
-    public ListType(Type elementType, Integer minCardinality, Integer maxCardinality) {
+    public SetType(Type elementType, Integer minCardinality, Integer maxCardinality) {
         super(elementType, minCardinality, maxCardinality);
     }
 
     @Override
     public void accept(Visitor v) {
-        v.visitListType(this);
+        v.visitSetType(this);
     }
 }

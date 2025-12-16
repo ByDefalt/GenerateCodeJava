@@ -1,35 +1,50 @@
 package prettyPrinter;
 
-import metaModel.Attribute;
-import metaModel.Entity;
-import metaModel.Model;
-import metaModel.types.Type;
+import metaModel.*;
+import metaModel.types.*;
 import visitor.Visitor;
 
+/**
+ * PrettyPrinter pour la syntaxe Minispec
+ * Utilise le pattern Visitor pour séparer la logique de présentation du métamodèle
+ */
 public class PrettyPrinter extends Visitor {
-    String result = "";
-    String currentTypeString = "";
+    private String result = "";
+    private String currentTypeString = "";
 
     public String result() {
         return result;
     }
 
+    @Override
     public void visitModel(Model e) {
-        result = "model "+e.getName()+";\n\n";
-
-        for (Entity n : e.getEntities()) {
-            n.accept(this);
+        if (e.getName() != null && !e.getName().isEmpty()) {
+            result = "model " + e.getName() + " ;\n\n";
+        } else {
+            result = "model ;\n\n";
         }
-        result = result + "end model;\n";
+
+        if (e.getEntities() != null) {
+            for (Entity n : e.getEntities()) {
+                n.accept(this);
+            }
+        }
+
+        result = result + "end model\n";
     }
 
+    @Override
     public void visitEntity(Entity e) {
-        result = result + "entity " + e.getName() + " ;\n";
+        result = result + "entity " + e.getName();
+
+        result = result + " ;\n";
+
         if (e.getAttributes() != null) {
             for (Attribute a : e.getAttributes()) {
                 a.accept(this);
             }
         }
+
         result = result + "end entity;\n\n";
     }
 
@@ -39,29 +54,73 @@ public class PrettyPrinter extends Visitor {
         currentTypeString = "";
         e.getType().accept(this);
 
-        result = result + "    " + e.getName() + " : " + currentTypeString + " ;\n";
+        result = result + "    " + e.getName() + " : " + currentTypeString;
+
+        result = result + " ;\n";
     }
 
     @Override
-    public void visitType(Type e) {
-        if (!e.isCollection()) {
-            currentTypeString = e.getBaseType();
-        } else {
-            StringBuilder sb = new StringBuilder();
-            sb.append(e.getCollectionType());
+    public void visitSimpleType(SimpleType e) {
+        currentTypeString = e.getTypeName();
+    }
 
-            if ("Array".equals(e.getCollectionType()) && e.getArraySize() != null) {
-                sb.append(" [").append(e.getArraySize()).append("]");
-            } else if (e.getMinCardinality() != null || e.getMaxCardinality() != null) {
-                sb.append(" [");
-                sb.append(e.getMinCardinality() != null ? e.getMinCardinality() : "*");
-                sb.append(":");
-                sb.append(e.getMaxCardinality() != null ? e.getMaxCardinality() : "*");
-                sb.append("]");
-            }
+    @Override
+    public void visitArrayType(ArrayType e) {
+        StringBuilder sb = new StringBuilder("Array");
 
-            sb.append(" of ").append(e.getBaseType());
-            currentTypeString = sb.toString();
+        if (e.getSize() != null) {
+            sb.append(" [").append(e.getSize()).append("]");
         }
+
+        sb.append(" of ").append(e.getElementType());
+        currentTypeString = sb.toString();
+    }
+
+    @Override
+    public void visitListType(ListType e) {
+        StringBuilder sb = new StringBuilder("List");
+
+        if (e.hasCardinality()) {
+            sb.append(" [");
+            sb.append(e.getMinCardinality() != null ? e.getMinCardinality() : "*");
+            sb.append(":");
+            sb.append(e.getMaxCardinality() != null ? e.getMaxCardinality() : "*");
+            sb.append("]");
+        }
+
+        sb.append(" of ").append(e.getElementType());
+        currentTypeString = sb.toString();
+    }
+
+    @Override
+    public void visitSetType(SetType e) {
+        StringBuilder sb = new StringBuilder("Set");
+
+        if (e.hasCardinality()) {
+            sb.append(" [");
+            sb.append(e.getMinCardinality() != null ? e.getMinCardinality() : "*");
+            sb.append(":");
+            sb.append(e.getMaxCardinality() != null ? e.getMaxCardinality() : "*");
+            sb.append("]");
+        }
+
+        sb.append(" of ").append(e.getElementType());
+        currentTypeString = sb.toString();
+    }
+
+    @Override
+    public void visitBagType(BagType e) {
+        StringBuilder sb = new StringBuilder("Bag");
+
+        if (e.hasCardinality()) {
+            sb.append(" [");
+            sb.append(e.getMinCardinality() != null ? e.getMinCardinality() : "*");
+            sb.append(":");
+            sb.append(e.getMaxCardinality() != null ? e.getMaxCardinality() : "*");
+            sb.append("]");
+        }
+
+        sb.append(" of ").append(e.getElementType());
+        currentTypeString = sb.toString();
     }
 }

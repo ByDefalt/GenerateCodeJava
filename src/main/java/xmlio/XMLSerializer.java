@@ -7,14 +7,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import metaModel.Attribute;
-import metaModel.types.Type;
+import metaModel.*;
+import metaModel.types.*;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import metaModel.Entity;
-import metaModel.Model;
 import visitor.Visitor;
 
 public class XMLSerializer extends Visitor {
@@ -56,7 +53,7 @@ public class XMLSerializer extends Visitor {
     }
 
     @Override
-    public void visitEntity(Entity e) {
+    public void visitEntity(metaModel.Entity e) {
         Element elem = this.doc.createElement("Entity");
         this.addIdToElement(elem);
         String entityId = "#" + this.counter.toString();
@@ -69,9 +66,11 @@ public class XMLSerializer extends Visitor {
         attr.setValue(e.getName().toString());
         elem.setAttributeNode(attr);
 
+
         this.root.appendChild(elem);
         elements.add(elem);
 
+        // Visiter les attributs
         if (e.getAttributes() != null) {
             for (Attribute a : e.getAttributes()) {
                 visitAttributeWithEntityId(a, entityId);
@@ -91,58 +90,119 @@ public class XMLSerializer extends Visitor {
         attr.setValue(a.getName());
         elem.setAttributeNode(attr);
 
+
+        // Sérialiser le type avec la nouvelle hiérarchie
         Type type = a.getType();
-        if (!type.isCollection()) {
-            attr = doc.createAttribute("type");
-            attr.setValue(type.getBaseType());
-            elem.setAttributeNode(attr);
-        } else {
-            attr = doc.createAttribute("type");
-            attr.setValue(type.getCollectionType());
-            elem.setAttributeNode(attr);
-
-            attr = doc.createAttribute("of");
-            attr.setValue(type.getBaseType());
-            elem.setAttributeNode(attr);
-
-            if ("Array".equals(type.getCollectionType()) && type.getArraySize() != null) {
-                attr = doc.createAttribute("size");
-                attr.setValue(type.getArraySize().toString());
-                elem.setAttributeNode(attr);
-            } else {
-                if (type.getMinCardinality() != null) {
-                    attr = doc.createAttribute("min");
-                    attr.setValue(type.getMinCardinality().toString());
-                    elem.setAttributeNode(attr);
-                }
-                if (type.getMaxCardinality() != null) {
-                    attr = doc.createAttribute("max");
-                    attr.setValue(type.getMaxCardinality().toString());
-                    elem.setAttributeNode(attr);
-                }
-            }
-        }
+        serializeType(type, elem);
 
         this.root.appendChild(elem);
         elements.add(elem);
     }
 
-    @Override
-    public void visitAttribute(Attribute e) {
+    /**
+     * Sérialise un type en utilisant la nouvelle hiérarchie OCP
+     */
+    private void serializeType(Type type, Element elem) {
+        Attr attr;
+
+        if (type instanceof SimpleType) {
+            // Type simple
+            attr = doc.createAttribute("type");
+            attr.setValue(type.getBaseType());
+            elem.setAttributeNode(attr);
+
+        } else if (type instanceof ArrayType) {
+            // Array avec taille
+            ArrayType arrayType = (ArrayType) type;
+
+            attr = doc.createAttribute("type");
+            attr.setValue("Array");
+            elem.setAttributeNode(attr);
+
+            attr = doc.createAttribute("of");
+            attr.setValue(arrayType.getElementType());
+            elem.setAttributeNode(attr);
+
+            if (arrayType.getSize() != null) {
+                attr = doc.createAttribute("size");
+                attr.setValue(arrayType.getSize().toString());
+                elem.setAttributeNode(attr);
+            }
+
+        } else if (type instanceof CollectionType) {
+            // List, Set, Bag avec cardinalités
+            CollectionType collectionType = (CollectionType) type;
+
+            attr = doc.createAttribute("type");
+            attr.setValue(collectionType.getCollectionTypeName());
+            elem.setAttributeNode(attr);
+
+            attr = doc.createAttribute("of");
+            attr.setValue(collectionType.getElementType());
+            elem.setAttributeNode(attr);
+
+            // Ajouter les cardinalités si présentes
+            if (collectionType.getMinCardinality() != null) {
+                attr = doc.createAttribute("min");
+                attr.setValue(collectionType.getMinCardinality().toString());
+                elem.setAttributeNode(attr);
+            }
+            if (collectionType.getMaxCardinality() != null) {
+                attr = doc.createAttribute("max");
+                attr.setValue(collectionType.getMaxCardinality().toString());
+                elem.setAttributeNode(attr);
+            }
+        }
     }
 
     @Override
-    public void visitType(Type e) {
+    public void visitAttribute(Attribute e) {
+        // Cette méthode ne devrait plus être appelée directement
+        // On utilise visitAttributeWithEntityId à la place
     }
+
+    @Override
+    public void visitSimpleType(SimpleType e) {
+
+    }
+
+    @Override
+    public void visitArrayType(ArrayType e) {
+
+    }
+
+    @Override
+    public void visitListType(ListType e) {
+
+    }
+
+    @Override
+    public void visitSetType(SetType e) {
+
+    }
+
+    @Override
+    public void visitBagType(BagType e) {
+
+    }
+
 
     @Override
     public void visitModel(Model e) {
         Element elem = this.doc.createElement("Model");
         this.addIdToElement(elem);
         this.maybeUpdateRootFrom(elem);
+
+        // Ajouter l'attribut name sur Root si le modèle a un nom
+        if (e.getName() != null && !e.getName().isEmpty()) {
+            Attr attr = doc.createAttribute("name");
+            attr.setValue(e.getName());
+            this.root.setAttributeNode(attr);
+        }
+
         this.root.appendChild(elem);
         elements.add(elem);
-        for (Entity n : e.getEntities()) {
+        for (metaModel.Entity n : e.getEntities()) {
             n.accept(this);
         }
     }

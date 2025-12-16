@@ -2,12 +2,12 @@ package xmlio;
 
 import javax.xml.parsers.*;
 
-import metaModel.types.Type;
+import metaModel.Entity;
 import org.w3c.dom.*;
 import org.xml.sax.*;
 
 import metaModel.*;
-import metaModel.Entity;
+import metaModel.types.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -16,7 +16,11 @@ import java.util.Map;
 
 public class XMLAnalyser {
 
+    // Les clés des 2 Map sont les id
+
+    // Map des instances de la syntaxe abstraite (metamodel)
     protected Map<String, MinispecElement> minispecIndex;
+    // Map des elements XML
     protected Map<String, Element> xmlElementIndex;
 
     public XMLAnalyser() {
@@ -25,16 +29,26 @@ public class XMLAnalyser {
     }
 
     protected Model modelFromElement(Element e) {
-        return new Model(e.getAttribute("name"));
+        Model model = new Model();
+        String name = e.getAttribute("name");
+        if (name != null && !name.isEmpty()) {
+            model.setName(name);
+        }
+        return model;
     }
 
     protected Entity entityFromElement(Element e) {
         String name = e.getAttribute("name");
+        String superType = e.getAttribute("supertype");
+
         Entity entity = new Entity();
         entity.setName(name);
 
+
+        // Initialiser la liste d'attributs
         entity.setAttributes(new ArrayList<>());
 
+        // Récupérer le modèle parent
         Element modelElement = this.xmlElementIndex.get(e.getAttribute("model"));
         if (modelElement != null) {
             Model model = (Model) minispecElementFromXmlElement(modelElement);
@@ -46,9 +60,13 @@ public class XMLAnalyser {
 
     protected Attribute attributeFromElement(Element e) {
         String name = e.getAttribute("name");
+        String initialValue = e.getAttribute("init");
         Type type = parseType(e);
-        Attribute attribute = new Attribute(name, type);
 
+        Attribute attribute;
+        attribute = new Attribute(name, type);
+
+        // Ajouter l'attribut à l'entité parente
         Element entityElement = this.xmlElementIndex.get(e.getAttribute("entity"));
         if (entityElement != null) {
             Entity entity = (Entity) minispecElementFromXmlElement(entityElement);
@@ -64,30 +82,33 @@ public class XMLAnalyser {
         String typeStr = e.getAttribute("type");
         String ofType = e.getAttribute("of");
 
+        // Type simple ou référence à une entité
         if (ofType == null || ofType.isEmpty()) {
-            return new Type(typeStr);
+            return new SimpleType(typeStr);
         }
 
-        String collectionType = typeStr;
+        // C'est une collection
+        String collectionType = typeStr; // List, Set, Bag, Array
 
+        // Array avec taille fixe
         if ("Array".equals(collectionType)) {
             String sizeStr = e.getAttribute("size");
+            Integer size = null;
             if (sizeStr != null && !sizeStr.isEmpty()) {
-                Integer size = Integer.parseInt(sizeStr);
-                return new Type(ofType, size);
+                size = Integer.parseInt(sizeStr);
             }
+            return new ArrayType(ofType, size);
         }
 
+        // Collection avec cardinalités
         String minStr = e.getAttribute("min");
         String maxStr = e.getAttribute("max");
 
-        if ((minStr != null && !minStr.isEmpty()) || (maxStr != null && !maxStr.isEmpty())) {
-            Integer min = (minStr != null && !minStr.isEmpty()) ? Integer.parseInt(minStr) : null;
-            Integer max = (maxStr != null && !maxStr.isEmpty()) ? Integer.parseInt(maxStr) : null;
-            return new Type(ofType, collectionType, min, max);
-        }
+        Integer min = (minStr != null && !minStr.isEmpty()) ? Integer.parseInt(minStr) : null;
+        Integer max = (maxStr != null && !maxStr.isEmpty()) ? Integer.parseInt(maxStr) : null;
 
-        return new Type(ofType, collectionType);
+        // Utiliser la factory pour créer le bon type de collection
+        return CollectionTypeFactory.create(ofType, collectionType, min, max);
     }
 
     protected MinispecElement minispecElementFromXmlElement(Element e) {
@@ -106,6 +127,12 @@ public class XMLAnalyser {
             result = entityFromElement(e);
         } else if (tag.equals("Attribute")) {
             result = attributeFromElement(e);
+        } else if (tag.equals("Type")) {
+
+            return null;
+        } else {
+            System.out.println("Unknown element type: " + tag);
+            return null;
         }
 
         if (result != null) {
@@ -114,6 +141,7 @@ public class XMLAnalyser {
         return result;
     }
 
+    // alimentation du map des elements XML
     protected void firstRound(Element el) {
         NodeList nodes = el.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -126,6 +154,7 @@ public class XMLAnalyser {
         }
     }
 
+    // alimentation du map des instances de la syntaxe abstraite (metamodel)
     protected void secondRound(Element el) {
         NodeList nodes = el.getChildNodes();
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -145,13 +174,23 @@ public class XMLAnalyser {
 
         Model model = (Model) this.minispecIndex.get(e.getAttribute("model"));
 
+        // Récupérer le nom depuis l'élément Root
+        if (model != null) {
+            String name = e.getAttribute("name");
+            if (name != null && !name.isEmpty()) {
+                model.setName(name);
+            }
+        }
+
         return model;
     }
 
     public Model getModelFromInputStream(InputStream stream) {
         try {
+            // création d'une fabrique de documents
             DocumentBuilderFactory fabrique = DocumentBuilderFactory.newInstance();
 
+            // création d'un constructeur de documents
             DocumentBuilder constructeur = fabrique.newDocumentBuilder();
             Document document = constructeur.parse(stream);
             return getModelFromDocument(document);
