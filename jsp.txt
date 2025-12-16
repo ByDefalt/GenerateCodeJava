@@ -1,0 +1,7 @@
+en gros faire javaVisitor avec des delegates pour chaque type de metaModel Model, Entity, Attribute, ect...
+de plus le visitor prend une configuration en parametre pour gerer certain chose, les import pour le moment.
+ducoup cela ferait un peux comme un decorateur pattern
+
+
+JavaConfiguration javaConfiguration = new JavaConfiguration("src/main/resources/imports-config.xml");
+JavaVisitor javaVisitor = new JavaVisitor(javaConfiguration, "src/main/resources/code.xml");

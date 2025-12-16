@@ -1,29 +1,26 @@
-package visitor;
+package visitor.java;
 
 import metaModel.*;
 import metaModel.types.*;
-
-import java.util.HashSet;
-import java.util.Set;
+import visitor.Visitor;
 
 public class JavaVisitor extends Visitor {
+
     private String resultBuffer = "";
     private String methodBuffer = "";
 
     private String currentJavaType = "";
 
+    private ModelDelegator modelDelegator = new ModelDelegator();
+
     @Override
     public void visitModel(Model e) {
-        // Générer toutes les classes
-        if (e.getEntities() != null) {
-            for (Entity ent : e.getEntities()) {
-                ent.accept(this);
-            }
-        }
+        modelDelegator.delegate(e, this);
     }
 
     @Override
     public void visitEntity(Entity e) {
+
         methodBuffer = "";
 
         StringBuilder classBuffer = new StringBuilder();

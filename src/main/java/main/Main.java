@@ -2,7 +2,7 @@ package main;
 
 import metaModel.Model;
 import prettyPrinter.PrettyPrinter;
-import visitor.JavaVisitor;
+import visitor.java.JavaVisitor;
 import xmlio.metaModelCreator.XMLAnalyser;
 
 public class Main {
