@@ -1,5 +1,6 @@
 package visitor.java;
 
+import metaModel.types.*;
 import visitor.CodeGenVisitor;
 
 public class JavaVisitor extends CodeGenVisitor {
@@ -9,15 +10,51 @@ public class JavaVisitor extends CodeGenVisitor {
                 new ModelJavaCodeGenDelegator(),
                 new EntityJavaCodeGenDelegator(),
                 new AttributeJavaCodeGenDelegator(),
-                new TypeJavaCodeGenDelegator(),
-                new CollectionJavaCodeGenDelegator(),
-                new SimpleTypeJavaCodeGenDelegator(),
-                new ResolvedReferenceJavaCodeGenDelegator(),
-                new UnresolvedReferenceJavaCodeGenDelegator(),
-                new ArrayTypeJavaCodeGenDelegator(),
-                new ListTypeJavaCodeGenDelegator(),
-                new SetTypeJavaCodeGenDelegator(),
-                new BagTypeJavaCodeGenDelegator()
+                null,
+                new CollectionJavaCodeGenDelegator()
         );
+    }
+
+    // --- Types simples et références ---
+
+    @Override
+    public void visitSimpleType(SimpleType e) {
+        getContext().currentType = e.getTypeName();
+    }
+
+    @Override
+    public void visitResolvedReference(ResolvedReference e) {
+        getContext().currentType = e.getReferencedEntity().getName();
+    }
+
+    @Override
+    public void visitUnresolvedReference(UnresolvedReference e) {
+        getContext().currentType = e.getEntityName();
+    }
+
+    // --- Collections et arrays ---
+
+    @Override
+    public void visitArrayType(ArrayType e) {
+        e.getElementType().accept(this);
+        getContext().currentType += "[]";
+    }
+
+    @Override
+    public void visitListType(ListType e) {
+        e.getElementType().accept(this);
+        getContext().currentType = "List<" + getContext().currentType + ">";
+    }
+
+    @Override
+    public void visitSetType(SetType e) {
+        e.getElementType().accept(this);
+        getContext().currentType = "Set<" + getContext().currentType + ">";
+    }
+
+    @Override
+    public void visitBagType(BagType e) {
+        e.getElementType().accept(this);
+        getContext().currentType = "List<" + getContext().currentType + ">";
     }
 }
