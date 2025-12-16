@@ -1,14 +1,13 @@
 package prettyPrinter;
 
-import metaModel.Attribute;
-import metaModel.Entity;
-import metaModel.Model;
-import metaModel.Type;
-import metaModel.Visitor;
+import metaModel.*;
+import metaModel.types.*;
+import visitor.Visitor;
+
 
 public class PrettyPrinter extends Visitor {
     private String result = "";
-    private String currentTypeString = ""; // Pour stocker temporairement le résultat de visitType
+    private String currentTypeString = "";
 
     public String result() {
         return result;
@@ -34,10 +33,8 @@ public class PrettyPrinter extends Visitor {
     @Override
     public void visitEntity(Entity e) {
         result = result + "entity " + e.getName();
-
-        // Ajouter le supertype si présent
-        if (e.hasSuperType()) {
-            result = result + " subtype of (" + e.getSuperType() + ")";
+        if (e.getSuperEntity() != null) {
+            result = result + " subtype of (" + e.getSuperEntity().getName() + ")";
         }
 
         result = result + " ;\n";
@@ -59,37 +56,117 @@ public class PrettyPrinter extends Visitor {
 
         result = result + "    " + e.getName() + " : " + currentTypeString;
 
-        // Ajouter la valeur initiale si présente
-        if (e.hasInitialValue()) {
-            result = result + " := " + e.getInitialValue();
-        }
-
         result = result + " ;\n";
     }
 
     @Override
-    public void visitType(Type e) {
-        if (!e.isCollection()) {
-            // Type simple
-            currentTypeString = e.getBaseType();
-        } else {
-            // Collection
-            StringBuilder sb = new StringBuilder();
-            sb.append(e.getCollectionType());
+    public void visitSimpleType(SimpleType e) {
+        currentTypeString = e.getTypeName();
+    }
 
-            // Ajouter les cardinalités ou la taille
-            if ("Array".equals(e.getCollectionType()) && e.getArraySize() != null) {
-                sb.append(" [").append(e.getArraySize()).append("]");
-            } else if (e.getMinCardinality() != null || e.getMaxCardinality() != null) {
-                sb.append(" [");
-                sb.append(e.getMinCardinality() != null ? e.getMinCardinality() : "*");
-                sb.append(":");
-                sb.append(e.getMaxCardinality() != null ? e.getMaxCardinality() : "*");
-                sb.append("]");
-            }
+    // --- Types de Collection ---
 
-            sb.append(" of ").append(e.getBaseType());
-            currentTypeString = sb.toString();
+    @Override
+    public void visitArrayType(ArrayType e) {
+        StringBuilder sb = new StringBuilder("Array");
+
+        if (e.getSize() != null) {
+            sb.append(" [").append(e.getSize()).append("]");
         }
+
+        // Visiter récursivement le type d'élément
+        String elementTypeString = getElementTypeString(e);
+
+        sb.append(" of ").append(elementTypeString);
+        currentTypeString = sb.toString();
+    }
+
+    @Override
+    public void visitListType(ListType e) {
+        StringBuilder sb = new StringBuilder("List");
+
+        // Utiliser getMinCardinality() et getMaxCardinality()
+        if (e.getMinCardinality() != null || e.getMaxCardinality() != null) {
+            sb.append(" [");
+            sb.append(e.getMinCardinality() != null ? e.getMinCardinality() : "*");
+            sb.append(":");
+            sb.append(e.getMaxCardinality() != null ? e.getMaxCardinality() : "*");
+            sb.append("]");
+        }
+
+        // Visiter récursivement le type d'élément
+        String elementTypeString = getElementTypeString(e);
+
+        sb.append(" of ").append(elementTypeString);
+        currentTypeString = sb.toString();
+    }
+
+    @Override
+    public void visitSetType(SetType e) {
+        StringBuilder sb = new StringBuilder("Set");
+
+        // Utiliser getMinCardinality() et getMaxCardinality()
+        if (e.getMinCardinality() != null || e.getMaxCardinality() != null) {
+            sb.append(" [");
+            sb.append(e.getMinCardinality() != null ? e.getMinCardinality() : "*");
+            sb.append(":");
+            sb.append(e.getMaxCardinality() != null ? e.getMaxCardinality() : "*");
+            sb.append("]");
+        }
+
+        // Visiter récursivement le type d'élément
+        String elementTypeString = getElementTypeString(e);
+
+        sb.append(" of ").append(elementTypeString);
+        currentTypeString = sb.toString();
+    }
+
+    @Override
+    public void visitBagType(BagType e) {
+        StringBuilder sb = new StringBuilder("Bag");
+
+        // Utiliser getMinCardinality() et getMaxCardinality()
+        if (e.getMinCardinality() != null || e.getMaxCardinality() != null) {
+            sb.append(" [");
+            sb.append(e.getMinCardinality() != null ? e.getMinCardinality() : "*");
+            sb.append(":");
+            sb.append(e.getMaxCardinality() != null ? e.getMaxCardinality() : "*");
+            sb.append("]");
+        }
+
+        // Visiter récursivement le type d'élément
+        String elementTypeString = getElementTypeString(e);
+
+        sb.append(" of ").append(elementTypeString);
+        currentTypeString = sb.toString();
+    }
+
+    // --- Types de Référence ---
+
+    @Override
+    public void visitUnresolvedReference(UnresolvedReference e) {
+        // Une référence non résolue est affichée comme son nom d'entité
+        currentTypeString = e.getEntityName();
+    }
+
+    @Override
+    public void visitResolvedReference(ResolvedReference e) {
+        // Une référence résolue est affichée comme son nom d'entité (on ignore l'objet Entity pour la pretty-impression)
+        currentTypeString = e.getEntityName();
+    }
+
+    // --- Méthode d'aide pour la visite récursive des types d'élément ---
+    private String getElementTypeString(CollectionType e) {
+        // Sauvegarder l'état actuel pour la récursion
+        String savedCurrentTypeString = currentTypeString;
+
+        // Visiter le type d'élément
+        e.getElementType().accept(this);
+        String elementTypeString = currentTypeString;
+
+        // Restaurer l'état pour la suite de la méthode appelante
+        currentTypeString = savedCurrentTypeString;
+
+        return elementTypeString;
     }
 }
