@@ -21,7 +21,7 @@ public class XMLSerializer extends Visitor {
     Integer counter;
     Document doc;
 
-    Document result() {
+    public Document result() {
         return this.doc;
     }
 
@@ -44,7 +44,7 @@ public class XMLSerializer extends Visitor {
 
     private void maybeUpdateRootFrom(Element e) {
         String rootId = this.root.getAttribute("model");
-        if (rootId.isEmpty()) {
+        if (rootId == null || rootId.isEmpty()) {
             Attr attr = this.doc.createAttribute("model");
             attr.setValue("#" + this.counter.toString());
             this.root.setAttributeNode(attr);
@@ -53,19 +53,45 @@ public class XMLSerializer extends Visitor {
     }
 
     @Override
+    public void visitModel(Model e) {
+        Element elem = this.doc.createElement("Model");
+        this.addIdToElement(elem);
+        this.maybeUpdateRootFrom(elem);
+
+        if (e.getName() != null && !e.getName().isEmpty()) {
+            Attr attr = doc.createAttribute("name");
+            attr.setValue(e.getName());
+            this.root.setAttributeNode(attr); // On met le nom sur la racine pour l'affichage
+
+            // On peut aussi le mettre sur l'élément Model lui-même
+            Attr attrModel = doc.createAttribute("name");
+            attrModel.setValue(e.getName());
+            elem.setAttributeNode(attrModel);
+        }
+
+        this.root.appendChild(elem);
+        elements.add(elem);
+
+        if (e.getEntities() != null) {
+            for (metaModel.Entity n : e.getEntities()) {
+                n.accept(this);
+            }
+        }
+    }
+
+    @Override
     public void visitEntity(metaModel.Entity e) {
         Element elem = this.doc.createElement("Entity");
         this.addIdToElement(elem);
-        String entityId = "#" + this.counter.toString();
+        String entityId = elem.getAttribute("id");
 
         Attr attr = doc.createAttribute("model");
         attr.setValue(modelId);
         elem.setAttributeNode(attr);
 
         attr = doc.createAttribute("name");
-        attr.setValue(e.getName().toString());
+        attr.setValue(e.getName());
         elem.setAttributeNode(attr);
-
 
         this.root.appendChild(elem);
         elements.add(elem);
@@ -90,8 +116,7 @@ public class XMLSerializer extends Visitor {
         attr.setValue(a.getName());
         elem.setAttributeNode(attr);
 
-
-        // Sérialiser le type avec la nouvelle hiérarchie
+        // Sérialiser le type
         Type type = a.getType();
         serializeType(type, elem);
 
@@ -100,110 +125,116 @@ public class XMLSerializer extends Visitor {
     }
 
     /**
-     * Sérialise un type en utilisant la nouvelle hiérarchie OCP
+     * Helper pour extraire le nom du type sous forme de String
+     * (nécessaire car getElementType retourne un objet Type)
+     */
+    private String getTypeNameString(Type type) {
+        if (type instanceof SimpleType) {
+            return ((SimpleType) type).getTypeName();
+        } else if (type instanceof ResolvedReference) {
+            return ((ResolvedReference) type).getReferencedEntity().getName();
+        } else if (type instanceof UnresolvedReference) {
+            return ((UnresolvedReference) type).getEntityName();
+        } else if (type instanceof CollectionType) {
+            // Pour les collections, on veut le type de l'élément contenu
+            return getTypeNameString(((CollectionType) type).getElementType());
+        }
+        return "Unknown";
+    }
+
+    /**
+     * Sérialise un type en utilisant le méta-modèle fourni
      */
     private void serializeType(Type type, Element elem) {
-        Attr attr;
+        Attr attrType = doc.createAttribute("type");
 
         if (type instanceof SimpleType) {
-            // Type simple
-            attr = doc.createAttribute("type");
-            attr.setValue(type.getBaseType());
-            elem.setAttributeNode(attr);
+            // Cas simple : String, Integer, etc.
+            attrType.setValue(((SimpleType) type).getTypeName());
+            elem.setAttributeNode(attrType);
 
-        } else if (type instanceof ArrayType) {
-            // Array avec taille
-            ArrayType arrayType = (ArrayType) type;
+        } else if (type instanceof ReferenceType) {
+            // Cas référence (traitée comme un type simple pointant vers l'entité)
+            String refName = (type instanceof ResolvedReference)
+                    ? ((ResolvedReference) type).getReferencedEntity().getName()
+                    : ((UnresolvedReference) type).getEntityName();
 
-            attr = doc.createAttribute("type");
-            attr.setValue("Array");
-            elem.setAttributeNode(attr);
+            attrType.setValue(refName);
+            elem.setAttributeNode(attrType);
 
-            attr = doc.createAttribute("of");
-            attr.setValue(arrayType.getElementType());
-            elem.setAttributeNode(attr);
-
-            if (arrayType.getSize() != null) {
-                attr = doc.createAttribute("size");
-                attr.setValue(arrayType.getSize().toString());
-                elem.setAttributeNode(attr);
-            }
+            // Optionnel : marquer que c'est une référence
+            Attr attrRef = doc.createAttribute("isReference");
+            attrRef.setValue("true");
+            elem.setAttributeNode(attrRef);
 
         } else if (type instanceof CollectionType) {
-            // List, Set, Bag avec cardinalités
-            CollectionType collectionType = (CollectionType) type;
+            // Cas Collections (Array, List, Set, Bag)
+            CollectionType collType = (CollectionType) type;
 
-            attr = doc.createAttribute("type");
-            attr.setValue(collectionType.getCollectionTypeName());
-            elem.setAttributeNode(attr);
+            // 1. Déterminer le nom de la collection pour l'attribut "type"
+            String collectionName = "Collection";
+            if (type instanceof ArrayType) collectionName = "Array";
+            else if (type instanceof ListType) collectionName = "List";
+            else if (type instanceof SetType) collectionName = "Set";
+            else if (type instanceof BagType) collectionName = "Bag";
 
-            attr = doc.createAttribute("of");
-            attr.setValue(collectionType.getElementType());
-            elem.setAttributeNode(attr);
+            attrType.setValue(collectionName);
+            elem.setAttributeNode(attrType);
 
-            // Ajouter les cardinalités si présentes
-            if (collectionType.getMinCardinality() != null) {
-                attr = doc.createAttribute("min");
-                attr.setValue(collectionType.getMinCardinality().toString());
-                elem.setAttributeNode(attr);
+            // 2. Définir le type contenu ("of")
+            Attr attrOf = doc.createAttribute("of");
+            attrOf.setValue(getTypeNameString(collType.getElementType()));
+            elem.setAttributeNode(attrOf);
+
+            // 3. Gestion spécifique Array (taille)
+            if (type instanceof ArrayType) {
+                Integer size = ((ArrayType) type).getSize();
+                if (size != null) {
+                    Attr attrSize = doc.createAttribute("size");
+                    attrSize.setValue(size.toString());
+                    elem.setAttributeNode(attrSize);
+                }
             }
-            if (collectionType.getMaxCardinality() != null) {
-                attr = doc.createAttribute("max");
-                attr.setValue(collectionType.getMaxCardinality().toString());
-                elem.setAttributeNode(attr);
+
+            // 4. Gestion des cardinalités (Min/Max)
+            if (collType.getMinCardinality() != null) {
+                Attr attrMin = doc.createAttribute("min");
+                attrMin.setValue(collType.getMinCardinality().toString());
+                elem.setAttributeNode(attrMin);
+            }
+            if (collType.getMaxCardinality() != null) {
+                Attr attrMax = doc.createAttribute("max");
+                attrMax.setValue(collType.getMaxCardinality().toString());
+                elem.setAttributeNode(attrMax);
             }
         }
     }
+
+    // --- Méthodes Visitor (Laissées vides car on gère la logique via serializeType ou visitAttributeWithEntityId) ---
 
     @Override
     public void visitAttribute(Attribute e) {
-        // Cette méthode ne devrait plus être appelée directement
-        // On utilise visitAttributeWithEntityId à la place
+        // Non utilisé directement, voir visitAttributeWithEntityId
     }
 
     @Override
-    public void visitSimpleType(SimpleType e) {
-
-    }
+    public void visitSimpleType(SimpleType e) {}
 
     @Override
-    public void visitArrayType(ArrayType e) {
-
-    }
+    public void visitArrayType(ArrayType e) {}
 
     @Override
-    public void visitListType(ListType e) {
-
-    }
+    public void visitListType(ListType e) {}
 
     @Override
-    public void visitSetType(SetType e) {
-
-    }
+    public void visitSetType(SetType e) {}
 
     @Override
-    public void visitBagType(BagType e) {
-
-    }
-
+    public void visitBagType(BagType e) {}
 
     @Override
-    public void visitModel(Model e) {
-        Element elem = this.doc.createElement("Model");
-        this.addIdToElement(elem);
-        this.maybeUpdateRootFrom(elem);
+    public void visitResolvedReference(ResolvedReference e) {}
 
-        // Ajouter l'attribut name sur Root si le modèle a un nom
-        if (e.getName() != null && !e.getName().isEmpty()) {
-            Attr attr = doc.createAttribute("name");
-            attr.setValue(e.getName());
-            this.root.setAttributeNode(attr);
-        }
-
-        this.root.appendChild(elem);
-        elements.add(elem);
-        for (metaModel.Entity n : e.getEntities()) {
-            n.accept(this);
-        }
-    }
+    @Override
+    public void visitUnresolvedReference(UnresolvedReference e) {}
 }

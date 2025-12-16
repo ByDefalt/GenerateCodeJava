@@ -2,20 +2,14 @@ package visitor;
 
 import metaModel.*;
 import metaModel.types.*;
-import metaModel.types.Type;
 
 import java.util.HashSet;
 import java.util.Set;
 
-/**
- * Visiteur pour générer du code Java
- * Toute la logique spécifique à Java est dans ce visiteur
- * Le métamodèle reste indépendant du langage
- */
 public class JavaVisitor extends Visitor {
     private String resultBuffer = "";
     private String methodBuffer = "";
-    private Set<String> imports = new HashSet<>();
+
     private String currentJavaType = "";
 
     @Override
@@ -30,96 +24,69 @@ public class JavaVisitor extends Visitor {
 
     @Override
     public void visitEntity(Entity e) {
-        // Réinitialiser pour chaque entité
         methodBuffer = "";
-        imports.clear();
 
         StringBuilder classBuffer = new StringBuilder();
         StringBuilder attributesBuffer = new StringBuilder();
 
-        // Ajouter les imports nécessaires
-        collectImports(e);
 
-        if (!imports.isEmpty()) {
-            for (String imp : imports) {
-                classBuffer.append("import ").append(imp).append(";\n");
-            }
-            classBuffer.append("\n");
-        }
 
-        // Déclaration de la classe avec héritage si présent
         classBuffer.append("public class ").append(e.getName());
-
+        if (e.getSuperEntity() != null) {
+            classBuffer.append(" extends ").append(e.getSuperEntity().getName());
+        }
         classBuffer.append(" {\n");
 
-        // Visiter les attributs
         if (e.getAttributes() != null) {
             for (Attribute a : e.getAttributes()) {
-                String savedResultBuffer = resultBuffer;
+                String savedResult = resultBuffer;
                 resultBuffer = "";
 
                 a.accept(this);
 
                 attributesBuffer.append(resultBuffer);
-                resultBuffer = savedResultBuffer;
+                resultBuffer = savedResult;
             }
         }
 
-        // Ajouter les attributs puis les méthodes
         classBuffer.append(attributesBuffer);
         classBuffer.append(methodBuffer);
         classBuffer.append("}\n\n");
 
-        resultBuffer += classBuffer.toString();
+        String existingContent = this.resultBuffer;
+        this.resultBuffer = existingContent + classBuffer.toString();
     }
 
-    private void collectImports(Entity e) {
-        if (e.getAttributes() != null) {
-            for (Attribute a : e.getAttributes()) {
-                Type type = a.getType();
-
-                if (type instanceof ListType) {
-                    imports.add("java.util.List");
-                    imports.add("java.util.ArrayList");
-                } else if (type instanceof SetType) {
-                    imports.add("java.util.Set");
-                    imports.add("java.util.HashSet");
-                } else if (type instanceof BagType) {
-                    imports.add("java.util.List");
-                    imports.add("java.util.ArrayList");
-                }
-            }
-        }
-    }
 
     @Override
     public void visitAttribute(Attribute e) {
         currentJavaType = "";
         e.getType().accept(this);
+        String javaFullType = currentJavaType;
 
-        String javaType = currentJavaType;
-        Type type = e.getType();
-
-        resultBuffer += "    private " + javaType + " " + e.getName();
-        resultBuffer += ";\n";
+        // Génération du champ
+        resultBuffer += "    private " + javaFullType + " " + e.getName() + ";\n";
 
         String capitalizedName = e.getName().substring(0, 1).toUpperCase() + e.getName().substring(1);
 
-        // Getter
-        methodBuffer += "\n    public " + javaType + " get" + capitalizedName + "() {\n";
+        // Génération du Getter
+        methodBuffer += "\n    public " + javaFullType + " get" + capitalizedName + "() {\n";
         methodBuffer += "        return " + e.getName() + ";\n";
         methodBuffer += "    }\n";
 
-        // Setter
-        methodBuffer += "\n    public void set" + capitalizedName + "(" + javaType + " " + e.getName() + ") {\n";
+        // Génération du Setter
+        methodBuffer += "\n    public void set" + capitalizedName + "(" + javaFullType + " " + e.getName() + ") {\n";
         methodBuffer += "        this." + e.getName() + " = " + e.getName() + ";\n";
         methodBuffer += "    }\n";
 
-        // Pour les collections, ajouter des méthodes utilitaires
-        if (type.isCollection()) {
-            generateCollectionMethods(e, type, capitalizedName);
+        // Génération des méthodes utilitaires pour les collections
+        // On vérifie le type instance car isCollection() n'existe pas dans Type
+        if (e.getType() instanceof CollectionType) {
+            generateCollectionMethods(e, (CollectionType) e.getType(), capitalizedName);
         }
     }
+
+    // --- Visite des Types ---
 
     @Override
     public void visitSimpleType(SimpleType e) {
@@ -127,32 +94,59 @@ public class JavaVisitor extends Visitor {
     }
 
     @Override
+    public void visitResolvedReference(ResolvedReference e) {
+        // On utilise le nom de l'entité référencée
+        currentJavaType = e.getReferencedEntity().getName();
+    }
+
+    @Override
+    public void visitUnresolvedReference(UnresolvedReference e) {
+        // On utilise le nom stocké (chaîne de caractères)
+        currentJavaType = e.getEntityName();
+    }
+
+    @Override
     public void visitArrayType(ArrayType e) {
-        currentJavaType = e.getElementType() + "[]";
+        // On doit visiter le sous-type pour obtenir son nom correct
+        e.getElementType().accept(this);
+        String elementTypeStr = currentJavaType;
+        currentJavaType = elementTypeStr + "[]";
     }
 
     @Override
     public void visitListType(ListType e) {
-        currentJavaType = "List<" + e.getElementType() + ">";
+        e.getElementType().accept(this);
+        String elementTypeStr = currentJavaType;
+        currentJavaType = "List<" + elementTypeStr + ">";
     }
 
     @Override
     public void visitSetType(SetType e) {
-        currentJavaType = "Set<" + e.getElementType() + ">";
+        e.getElementType().accept(this);
+        String elementTypeStr = currentJavaType;
+        currentJavaType = "Set<" + elementTypeStr + ">";
     }
 
     @Override
     public void visitBagType(BagType e) {
-        // Bag implémenté comme List en Java
-        currentJavaType = "List<" + e.getElementType() + ">";
+        // Bag est souvent implémenté comme une List
+        e.getElementType().accept(this);
+        String elementTypeStr = currentJavaType;
+        currentJavaType = "List<" + elementTypeStr + ">";
     }
 
-    private void generateCollectionMethods(Attribute attr, Type type, String capitalizedName) {
-        String baseType = type.getBaseType();
+    // --- Helpers ---
+
+    private void generateCollectionMethods(Attribute attr, CollectionType type, String capitalizedName) {
+        // Pour générer add/remove, il nous faut le type de l'élément (le "base type")
+        // On visite le sous-type pour récupérer sa chaîne Java (ex: "String", "Person")
+        type.getElementType().accept(this);
+        String baseType = currentJavaType;
+
         String attrName = attr.getName();
 
         if (type instanceof ArrayType) {
-            // Pour les arrays, générer des méthodes d'accès par index
+            // Pour les arrays
             methodBuffer += "\n    public " + baseType + " get" + capitalizedName + "At(int index) {\n";
             methodBuffer += "        return " + attrName + "[index];\n";
             methodBuffer += "    }\n";
@@ -161,45 +155,43 @@ public class JavaVisitor extends Visitor {
             methodBuffer += "        " + attrName + "[index] = value;\n";
             methodBuffer += "    }\n";
 
-        } else if (type instanceof CollectionType) {
-            CollectionType collType = (CollectionType) type;
-
+        } else {
+            // List, Set, Bag
             String singularName = capitalizedName.endsWith("s") ?
                     capitalizedName.substring(0, capitalizedName.length() - 1) :
                     capitalizedName;
 
-            // Déterminer le type d'implémentation
             String implType;
             if (type instanceof SetType) {
                 implType = "HashSet";
             } else {
-                implType = "ArrayList";
+                implType = "ArrayList"; // Pour List et Bag
             }
 
-            // Méthode add
+            // Méthode ADD
             methodBuffer += "\n    public void add" + singularName + "(" + baseType + " item) {\n";
             methodBuffer += "        if (this." + attrName + " == null) {\n";
             methodBuffer += "            this." + attrName + " = new " + implType + "<>();\n";
             methodBuffer += "        }\n";
 
-            // Vérifier les cardinalités si elles existent
-            if (collType.getMaxCardinality() != null) {
-                methodBuffer += "        if (this." + attrName + ".size() >= " + collType.getMaxCardinality() + ") {\n";
-                methodBuffer += "            throw new IllegalStateException(\"Cannot add more than " + collType.getMaxCardinality() + " items\");\n";
+            // Vérification Max Cardinality
+            if (type.getMaxCardinality() != null) {
+                methodBuffer += "        if (this." + attrName + ".size() >= " + type.getMaxCardinality() + ") {\n";
+                methodBuffer += "            throw new IllegalStateException(\"Cannot add more than " + type.getMaxCardinality() + " items\");\n";
                 methodBuffer += "        }\n";
             }
 
             methodBuffer += "        this." + attrName + ".add(item);\n";
             methodBuffer += "    }\n";
 
-            // Méthode remove
+            // Méthode REMOVE
             methodBuffer += "\n    public void remove" + singularName + "(" + baseType + " item) {\n";
             methodBuffer += "        if (this." + attrName + " != null) {\n";
 
-            // Vérifier les cardinalités minimales si elles existent
-            if (collType.getMinCardinality() != null) {
-                methodBuffer += "            if (this." + attrName + ".size() <= " + collType.getMinCardinality() + ") {\n";
-                methodBuffer += "                throw new IllegalStateException(\"Cannot have less than " + collType.getMinCardinality() + " items\");\n";
+            // Vérification Min Cardinality
+            if (type.getMinCardinality() != null) {
+                methodBuffer += "            if (this." + attrName + ".size() <= " + type.getMinCardinality() + ") {\n";
+                methodBuffer += "                throw new IllegalStateException(\"Cannot have less than " + type.getMinCardinality() + " items\");\n";
                 methodBuffer += "            }\n";
             }
 
@@ -207,7 +199,7 @@ public class JavaVisitor extends Visitor {
             methodBuffer += "        }\n";
             methodBuffer += "    }\n";
 
-            // Méthode size
+            // Méthode SIZE
             methodBuffer += "\n    public int get" + capitalizedName + "Size() {\n";
             methodBuffer += "        return this." + attrName + " != null ? this." + attrName + ".size() : 0;\n";
             methodBuffer += "    }\n";
