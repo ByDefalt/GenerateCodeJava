@@ -24,7 +24,7 @@ public class EntityCreator implements ElementCreator<Entity> {
         String extendId = xmlElement.getAttribute("extend");
         Entity superEntity = null;
 
-        if (extendId != null && !extendId.isEmpty()) {
+        if (!extendId.isEmpty()) {
             if (extendId.startsWith("#")) {
                 MinispecElement parentObj = context.getOrCreateElement(extendId);
 

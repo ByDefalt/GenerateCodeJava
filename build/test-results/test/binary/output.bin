@@ -1,0 +1,15 @@
+model SpaceMissionHybrid ;
+
+entity Satellite ;
+    id : Integer ;
+    parent_flotte : Flotte ;
+end entity;
+
+'entity Flotte subtype of (Satellite) ;
+    nom : String ;
+*    satellites : Bag [0:*] of Satellite ;
+end entity;
+
+
+end model
+

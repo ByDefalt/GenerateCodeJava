@@ -17,11 +17,11 @@ import java.io.*;
  * - Détection de cycles isolée dans sa propre classe
  * - Résolution de types dans une classe dédiée
  * - Pattern Registry pour l'extensibilité (OCP)
- * 
+ * <p>
  * Pour étendre le système avec de nouveaux types d'éléments :
  * 1. Créer une classe implémentant ElementCreator
  * 2. L'enregistrer via getContext().getCreatorRegistry().register(...)
- * 
+ * <p>
  * Exemple :
  * <code>
  * XMLAnalyser analyser = new XMLAnalyser();
@@ -69,7 +69,7 @@ public class XMLAnalyser {
     private Model findAndCreateModel(Element root) {
         // Méthode 1 : Attribut "model" sur la racine
         String modelId = root.getAttribute("model");
-        if (modelId != null && !modelId.isEmpty()) {
+        if (!modelId.isEmpty()) {
             return (Model) context.getOrCreateElement(modelId);
         }
 

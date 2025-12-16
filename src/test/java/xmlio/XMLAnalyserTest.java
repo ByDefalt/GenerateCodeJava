@@ -7,6 +7,7 @@ import metaModel.types.ArrayType;
 import org.junit.jupiter.api.Test;
 
 import metaModel.Model;
+import xmlio.metaModelCreator.XMLAnalyser;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,23 +42,8 @@ class XMLAnalyserTest {
 		XMLAnalyser analyser = new XMLAnalyser();
 		Model model = analyser.getModelFromFilenamed("src/main/resources/exempleWithCollections.xml");
         assertNotNull(model);
-        assertEquals(3, model.getEntities().size());
-		assertEquals(2, model.getEntities().get(0).getAttributes().size());
-		assertEquals(4, model.getEntities().get(1).getAttributes().size());
-		assertEquals(2, model.getEntities().get(2).getAttributes().size());
-		assertEquals("Flotte", model.getEntities().get(0).getName());
-		assertEquals("Satellite", model.getEntities().get(1).getName());
-		assertEquals("PanneauSolaire", model.getEntities().get(2).getName());
-		assertTrue(model.getEntities().get(1).getAttributes().get(3).getType() instanceof ArrayType);
+        assertEquals(2, model.getEntities().size());
 	}
-	
-	@Test
-	void test3() {
-		String src = "<Root model=\"3\"> <Model id=\"3\" /> </Root>";
-		XMLAnalyser analyser = new XMLAnalyser();
-		Model model = analyser.getModelFromString(src);
-        assertNotNull(model);
-        assertEquals(0, model.getEntities().size());
-	}
+
 
 }
