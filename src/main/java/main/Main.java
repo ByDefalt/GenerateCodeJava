@@ -2,6 +2,7 @@ package main;
 
 import metaModel.Model;
 import prettyPrinter.PrettyPrinter;
+import visitor.CodeGenVisitor;
 import visitor.java.JavaVisitor;
 import xmlio.metaModelCreator.XMLAnalyser;
 
@@ -12,7 +13,7 @@ public class Main {
         Model model = analyser.getModelFromFilenamed("src/main/resources/exempleWithCollections.xml");
 
         if (model != null) {
-            JavaVisitor javaVisitor = new JavaVisitor();
+            CodeGenVisitor javaVisitor = new JavaVisitor();
             model.accept(javaVisitor);
             System.out.println(javaVisitor.getResult());
             PrettyPrinter prettyPrinter = new PrettyPrinter();

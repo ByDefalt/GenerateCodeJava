@@ -1,9 +1,10 @@
 package main;
 
 import metaModel.Model;
-import visitor.java.JavaVisitor;
+import visitor.CodeGenVisitor;
 import visitor.imports.CustomDateImportCollector;
-import visitor.imports.JavaImportsVisitor;
+import visitor.java.JavaImportsVisitor;
+import visitor.java.JavaVisitor;
 import xmlio.metaModelCreator.XMLAnalyser;
 
 /**
@@ -17,7 +18,7 @@ public class MainWithImports {
 
         if (model != null) {
             // Créer le visiteur de base
-            JavaVisitor baseVisitor = new JavaVisitor();
+            CodeGenVisitor baseVisitor = new JavaVisitor();
 
             // Le décorer avec la gestion des imports
             JavaImportsVisitor decoratedVisitor =

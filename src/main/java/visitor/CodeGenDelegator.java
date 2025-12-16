@@ -1,6 +1,6 @@
 package visitor;
 
-public interface Delegator {
+public interface CodeGenDelegator {
 
     void delegate(Object element, Visitor visitor);
 }

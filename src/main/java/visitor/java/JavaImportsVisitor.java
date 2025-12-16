@@ -1,9 +1,10 @@
-package visitor.imports;
+package visitor.java;
 
 import metaModel.*;
 import metaModel.types.*;
-import visitor.java.JavaVisitor;
+import visitor.CodeGenVisitor;
 import visitor.Visitor;
+import visitor.imports.ImportCollectorRegistry;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -22,11 +23,11 @@ import java.util.regex.Pattern;
  */
 public class JavaImportsVisitor extends Visitor {
     
-    private final JavaVisitor delegate;
+    private final CodeGenVisitor delegate;
     private final ImportCollectorRegistry importRegistry;
     private final Map<String, Set<String>> entityImports; // entityName -> imports
     
-    public JavaImportsVisitor(JavaVisitor delegate) {
+    public JavaImportsVisitor(CodeGenVisitor delegate) {
         this.delegate = delegate;
         this.importRegistry = new ImportCollectorRegistry();
         this.entityImports = new HashMap<>();
