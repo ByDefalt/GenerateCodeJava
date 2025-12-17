@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<java-code id="#1">
+    <model id="#2" name="Meuble" package="m2tiil.meuble" code="#1"/>
+    <model id="#3" name="Bataille" package="m2tiil.batailleNavale" code="#1"/>
+
+    <primitive id="#4" name="String" type="String" code="#1"/>
+    <primitive id="#5" name="Integer" type="Integer" code="#1"/>
+    <primitive id="#6" name="List" type="ArrayList" package="java.util.ArrayList" code="#1"/>
+    <primitive id="#7" name="Array" type="Array" package="m2tiil.Array" code="#1"/>
+    <primitive id="#8" name="Set" type="HashSet" package="java.util.HashSet" code="#1"/>
+    <primitive id="#9" name="Bag" type="Bag" package="m2tiil.Bag" code="#1"/>
+</java-code>

@@ -1,6 +1,6 @@
 package xmlio.metaModelCreator;
 
-import metaModel.Model;
+import metaModel.minispec.Model;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 

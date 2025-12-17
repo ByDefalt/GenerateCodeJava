@@ -1,13 +1,13 @@
 package xmlio.metaModelCreator;
 
-import metaModel.MinispecElement;
+import metaModel.MetaModelElement;
 import org.w3c.dom.Element;
 
 /**
  * Interface pour la création d'éléments du métamodèle à partir d'éléments XML.
  * Utilise des génériques pour éviter les casts.
  */
-public interface ElementCreator<T extends MinispecElement> {
+public interface ElementCreator<T extends MetaModelElement> {
     
     /**
      * Vérifie si ce créateur peut gérer l'élément XML donné

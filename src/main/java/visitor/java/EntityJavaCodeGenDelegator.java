@@ -1,7 +1,7 @@
 package visitor.java;
 
-import metaModel.Attribute;
-import metaModel.Entity;
+import metaModel.minispec.Attribute;
+import metaModel.minispec.Entity;
 import visitor.CodeGenDelegator;
 import visitor.CodeGenVisitor;
 import visitor.Context;

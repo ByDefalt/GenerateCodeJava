@@ -1,6 +1,7 @@
 package visitor.java;
 
-import metaModel.types.*;
+import metaModel.configMetaModel.java.JavaMetaModelConfiguration;
+import metaModel.minispec.types.*;
 import visitor.CodeGenVisitor;
 
 public class JavaVisitor extends CodeGenVisitor {
@@ -11,7 +12,8 @@ public class JavaVisitor extends CodeGenVisitor {
                 new EntityJavaCodeGenDelegator(),
                 new AttributeJavaCodeGenDelegator(),
                 null,
-                new CollectionJavaCodeGenDelegator()
+                new CollectionJavaCodeGenDelegator(),
+                new JavaMetaModelConfiguration()
         );
     }
 

@@ -3,7 +3,7 @@ package prettyPrinter;
 
 import org.junit.jupiter.api.Test;
 
-import metaModel.Model;
+import metaModel.minispec.Model;
 import xmlio.metaModelCreator.XMLAnalyser;
 
 class PrettyPrinterTest {

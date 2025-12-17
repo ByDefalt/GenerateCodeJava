@@ -1,7 +1,10 @@
 package xmlio.metaModelCreator;
 
-import metaModel.MinispecElement;
+import metaModel.MetaModelElement;
+import metaModel.minispec.MinispecElement;
 import org.w3c.dom.Element;
+import xmlio.metaModelCreator.minispec.TypeResolver;
+
 import java.util.List;
 
 /**
@@ -13,8 +16,8 @@ public interface CreationContext {
     /**
      * Récupère ou crée un élément à partir de son ID
      */
-    MinispecElement getOrCreateElement(String id);
-    
+    MetaModelElement getOrCreateElement(String id);
+
     /**
      * Récupère un élément XML à partir de son ID
      */
@@ -23,7 +26,7 @@ public interface CreationContext {
     /**
      * Enregistre un élément créé dans le cache
      */
-    void registerElement(String id, MinispecElement element);
+    void registerElement(String id, MetaModelElement element);
     
     /**
      * Signale une erreur pendant la création
@@ -39,4 +42,9 @@ public interface CreationContext {
      * Trouve tous les éléments XML enfants d'un parent donné
      */
     List<Element> findChildElements(String parentId, String childTagName, String parentAttribute);
+
+    /**
+     * Trouve tous les éléments XML enfants du contexte courant
+     */
+    List<Element> findChildElements(String parenTagName);
 }

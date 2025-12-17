@@ -1,7 +1,9 @@
 package xmlio.metaModelCreator;
 
-import metaModel.MinispecElement;
+import metaModel.MetaModelElement;
+import metaModel.minispec.MinispecElement;
 import org.w3c.dom.Element;
+import xmlio.metaModelCreator.minispec.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +54,7 @@ public class ElementCreatorRegistry {
     /**
      * Crée un élément en utilisant le créateur approprié
      */
-    public MinispecElement createElement(Element xmlElement, CreationContext context) {
+    public MetaModelElement createElement(Element xmlElement, CreationContext context) {
         ElementCreator creator = findCreator(xmlElement);
         if (creator != null) {
             return creator.create(xmlElement, context);
@@ -64,7 +66,7 @@ public class ElementCreatorRegistry {
      * Remplit les détails d'un élément en utilisant le créateur approprié
      */
     @SuppressWarnings("unchecked")
-    public void fillElementDetails(MinispecElement element, Element xmlElement, CreationContext context) {
+    public void fillElementDetails(MetaModelElement element, Element xmlElement, CreationContext context) {
         ElementCreator creator = findCreator(xmlElement);
         if (creator != null) {
             creator.fillDetails(element, xmlElement, context);

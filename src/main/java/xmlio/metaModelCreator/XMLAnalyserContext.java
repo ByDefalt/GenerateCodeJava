@@ -1,7 +1,10 @@
 package xmlio.metaModelCreator;
 
-import metaModel.MinispecElement;
+import metaModel.MetaModelElement;
+import metaModel.minispec.MinispecElement;
 import org.w3c.dom.Element;
+import xmlio.metaModelCreator.minispec.CircularDependencyDetector;
+import xmlio.metaModelCreator.minispec.TypeResolver;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +16,7 @@ import java.util.Map;
  */
 public class XMLAnalyserContext implements CreationContext {
     
-    private final Map<String, MinispecElement> minispecIndex;
+    private final Map<String, MetaModelElement> minispecIndex;
     private final Map<String, Element> xmlElementIndex;
     private final CircularDependencyDetector cycleDetector;
     private final TypeResolver typeResolver;
@@ -28,7 +31,7 @@ public class XMLAnalyserContext implements CreationContext {
     }
     
     @Override
-    public MinispecElement getOrCreateElement(String id) {
+    public MetaModelElement getOrCreateElement(String id) {
         if (id == null || !id.startsWith("#")) {
             return null;
         }
@@ -54,7 +57,7 @@ public class XMLAnalyserContext implements CreationContext {
             }
 
             // 4. Création de l'élément
-            MinispecElement createdObject = creatorRegistry.createElement(xmlElement, this);
+            MetaModelElement createdObject = creatorRegistry.createElement(xmlElement, this);
 
             // 5. Enregistrement et remplissage
             if (createdObject != null) {
@@ -76,7 +79,7 @@ public class XMLAnalyserContext implements CreationContext {
     }
     
     @Override
-    public void registerElement(String id, MinispecElement element) {
+    public void registerElement(String id, MetaModelElement element) {
         minispecIndex.put(id, element);
     }
     
@@ -102,7 +105,19 @@ public class XMLAnalyserContext implements CreationContext {
         }
         return result;
     }
-    
+
+    @Override
+    public List<Element> findChildElements(String parenTagName) {
+        List<Element> result = new ArrayList<>();
+        for (Map.Entry<String, Element> entry : xmlElementIndex.entrySet()) {
+            Element childEl = entry.getValue();
+            if (parenTagName.equals(childEl.getTagName())) {
+                result.add(childEl);
+            }
+        }
+        return result;
+    }
+
     /**
      * Ajoute un élément XML à l'index
      */
@@ -113,7 +128,7 @@ public class XMLAnalyserContext implements CreationContext {
     /**
      * Récupère un élément déjà créé du cache
      */
-    public MinispecElement getCachedElement(String id) {
+    public MetaModelElement getCachedElement(String id) {
         return minispecIndex.get(id);
     }
     

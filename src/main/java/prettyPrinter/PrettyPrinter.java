@@ -1,7 +1,9 @@
 package prettyPrinter;
 
-import metaModel.*;
-import metaModel.types.*;
+import metaModel.minispec.Attribute;
+import metaModel.minispec.Entity;
+import metaModel.minispec.Model;
+import metaModel.minispec.types.*;
 import visitor.Visitor;
 
 

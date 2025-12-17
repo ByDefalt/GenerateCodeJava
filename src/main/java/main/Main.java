@@ -1,6 +1,6 @@
 package main;
 
-import metaModel.Model;
+import metaModel.minispec.Model;
 import prettyPrinter.PrettyPrinter;
 import visitor.CodeGenVisitor;
 import visitor.java.JavaVisitor;
