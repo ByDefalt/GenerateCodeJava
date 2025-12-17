@@ -14,10 +14,14 @@ import java.util.regex.Pattern;
  * Décorateur qui ajoute la gestion des imports au JavaVisitor existant.
  * Évite la duplication de code en réutilisant JavaVisitor (Decorator Pattern).
  * 
+ * Utilise maintenant un système de configuration XML pour les mappings de types.
+ * 
  * Usage:
+ * TypeMappingConfig config = new TypeMappingConfig();
+ * config.loadFromXml("config/type-mapping.xml");
+ * ImportCollectorRegistry registry = new ImportCollectorRegistry(config);
  * JavaVisitor baseVisitor = new JavaVisitor();
- * JavaVisitorWithImportsDecorator visitor = new JavaVisitorWithImportsDecorator(baseVisitor);
- * visitor.getImportRegistry().register(new CustomImportCollector());
+ * JavaImportsVisitor visitor = new JavaImportsVisitor(baseVisitor, registry);
  * model.accept(visitor);
  * String code = visitor.getResult();
  */
@@ -27,12 +31,25 @@ public class JavaImportsVisitor extends Visitor {
     private final ImportCollectorRegistry importRegistry;
     private final Map<String, Set<String>> entityImports; // entityName -> imports
     
-    public JavaImportsVisitor(CodeGenVisitor delegate) {
+    /**
+     * Constructeur avec visiteur délégué et registry personnalisé
+     */
+    public JavaImportsVisitor(CodeGenVisitor delegate, ImportCollectorRegistry importRegistry) {
         this.delegate = delegate;
-        this.importRegistry = new ImportCollectorRegistry();
+        this.importRegistry = importRegistry;
         this.entityImports = new HashMap<>();
     }
     
+    /**
+     * Constructeur avec visiteur délégué et registry par défaut
+     */
+    public JavaImportsVisitor(CodeGenVisitor delegate) {
+        this(delegate, new ImportCollectorRegistry());
+    }
+    
+    /**
+     * Constructeur par défaut
+     */
     public JavaImportsVisitor() {
         this(new JavaVisitor());
     }

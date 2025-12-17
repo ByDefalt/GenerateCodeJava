@@ -8,9 +8,18 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Exemple de collecteur d'imports personnalisé pour les types primitifs spéciaux.
- * Montre comment étendre le système sans modifier le code existant (OCP).
+ * OBSOLÈTE: Ce collecteur est maintenant remplacé par le système de configuration TypeMappingConfig.
+ * 
+ * Au lieu de créer un collecteur personnalisé pour chaque type,
+ * ajoutez simplement une entrée dans le fichier de configuration XML:
+ * 
+ * <primitive name="Date" type="Date" package="java.util.Date"/>
+ * 
+ * Cette classe est conservée pour compatibilité mais ne devrait plus être utilisée.
+ * 
+ * @deprecated Utilisez TypeMappingConfig à la place
  */
+@Deprecated
 public class CustomDateImportCollector implements ImportCollector {
     
     @Override

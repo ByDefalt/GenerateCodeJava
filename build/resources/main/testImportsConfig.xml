@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Root model="#1">
+    <!-- Modèle de test pour la configuration des imports -->
+    <Model id="#1" name="TestImportsConfig"/>
+    
+    <!-- Entité Personne avec différents types -->
+    <Entity id="#2" model="#1" name="Personne" />
+    <Attribute id="#3" entity="#2" name="nom" type="String" />
+    <Attribute id="#4" entity="#2" name="age" type="Integer" />
+    <Attribute id="#5" entity="#2" name="dateNaissance" type="Date" />
+    <Attribute id="#6" entity="#2" name="salaire" type="BigDecimal" />
+    
+    <!-- Entité Événement avec LocalDateTime -->
+    <Entity id="#7" model="#1" name="Evenement" />
+    <Attribute id="#8" entity="#7" name="titre" type="String" />
+    <Attribute id="#9" entity="#7" name="dateDebut" type="LocalDateTime" />
+    <Attribute id="#10" entity="#7" name="dateFin" type="LocalDateTime" />
+    
+    <!-- Collection avec référence -->
+    <Reference id="#11" name="Personne" entity="#2" />
+    <List id="#12" ref="#11" min="0" max="*" />
+    <Attribute id="#13" entity="#7" name="participants" type="#12" />
+</Root>

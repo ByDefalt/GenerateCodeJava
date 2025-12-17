@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config package="java.util">
+    <!-- Types primitifs Java (pas d'import nécessaire) -->
+    <primitive name="Integer" type="Integer"/>
+    <primitive name="String" type="String"/>
+    <primitive name="Double" type="Double"/>
+    <primitive name="Boolean" type="Boolean"/>
+    <primitive name="Long" type="Long"/>
+    <primitive name="Float" type="Float"/>
+    
+    <!-- Types nécessitant des imports -->
+    <primitive name="Date" type="Date" package="java.util.Date"/>
+    <primitive name="BigDecimal" type="BigDecimal" package="java.math.BigDecimal"/>
+    <primitive name="LocalDate" type="LocalDate" package="java.time.LocalDate"/>
+    <primitive name="LocalDateTime" type="LocalDateTime" package="java.time.LocalDateTime"/>
+    
+    <!-- Collections (imports gérés séparément par CollectionTypeImportCollector) -->
+    <primitive name="List" type="List" package="java.util.List"/>
+    <primitive name="Set" type="Set" package="java.util.Set"/>
+    <primitive name="Map" type="Map" package="java.util.Map"/>
+</config>
