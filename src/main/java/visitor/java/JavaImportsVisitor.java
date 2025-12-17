@@ -74,7 +74,7 @@ public class JavaImportsVisitor extends Visitor {
             }
         }
         entityImports.put(e.getName(), imports);
-        
+        delegate.getContext().result.append(imports);
         delegate.visitEntity(e);
     }
 
