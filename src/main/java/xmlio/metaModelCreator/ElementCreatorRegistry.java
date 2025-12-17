@@ -3,6 +3,9 @@ package xmlio.metaModelCreator;
 import metaModel.MetaModelElement;
 import metaModel.minispec.MinispecElement;
 import org.w3c.dom.Element;
+import xmlio.metaModelCreator.ConfigSpec.JavaMetaModelConfigurationCreator;
+import xmlio.metaModelCreator.ConfigSpec.ModelConfigCreator;
+import xmlio.metaModelCreator.ConfigSpec.PrimitiveConfigCreator;
 import xmlio.metaModelCreator.minispec.*;
 
 import java.util.ArrayList;
@@ -30,6 +33,9 @@ public class ElementCreatorRegistry {
         register(new AttributeCreator());
         register(new ReferenceCreator());
         register(new CollectionTypeCreator());
+        register(new ModelConfigCreator());
+        register(new PrimitiveConfigCreator());
+        register(new JavaMetaModelConfigurationCreator());
     }
     
     /**

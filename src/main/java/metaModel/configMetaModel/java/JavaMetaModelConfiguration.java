@@ -31,4 +31,13 @@ public class JavaMetaModelConfiguration implements MetaModelConfiguration, Confi
     public void accept(Visitor v) {
 
     }
+
+
+    @Override
+    public String toString() {
+        return "JavaMetaModelConfiguration{" +
+                "modelConfigs=" + modelConfigs +
+                ", primitiveConfigs=" + primitiveConfigs +
+                '}';
+    }
 }

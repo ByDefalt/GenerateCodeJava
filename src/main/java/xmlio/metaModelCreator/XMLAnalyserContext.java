@@ -35,7 +35,6 @@ public class XMLAnalyserContext implements CreationContext {
         if (id == null || !id.startsWith("#")) {
             return null;
         }
-
         // 1. Si déjà en cache, on retourne
         if (minispecIndex.containsKey(id)) {
             return minispecIndex.get(id);

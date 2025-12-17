@@ -2,6 +2,8 @@
 <java-code id="#1">
     <model id="#2" name="Meuble" package="m2tiil.meuble" code="#1"/>
     <model id="#3" name="Bataille" package="m2tiil.batailleNavale" code="#1"/>
+    <model id="#10" name="Flotte" package="m2tiil.batailleNavale" code="#1"/>
+    <model id="#11" name="Satellite" package="m2tiil.dsssd" code="#1"/>
 
     <primitive id="#4" name="String" type="String" code="#1"/>
     <primitive id="#5" name="Integer" type="Integer" code="#1"/>

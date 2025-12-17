@@ -19,4 +19,25 @@ public class PrimitiveConfig implements ConfigElement {
     public void accept(Visitor v) {
 
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getPackageName() {
+        return packageName;
+    }
+
+    @Override
+    public String toString() {
+        return "PrimitiveConfig{" +
+                "name='" + name + '\'' +
+                ", type='" + type + '\'' +
+                ", packageName='" + packageName + '\'' +
+                '}';
+    }
 }

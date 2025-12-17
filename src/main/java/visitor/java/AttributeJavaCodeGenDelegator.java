@@ -1,11 +1,16 @@
 package visitor.java;
 
+import metaModel.configMetaModel.java.JavaMetaModelConfiguration;
+import metaModel.configMetaModel.java.ModelConfig;
+import metaModel.configMetaModel.java.PrimitiveConfig;
 import metaModel.minispec.Attribute;
 import metaModel.minispec.types.CollectionType;
 import visitor.CodeGenDelegator;
 import visitor.CodeGenVisitor;
 import visitor.Context;
 import visitor.Visitor;
+
+import java.util.List;
 
 public class AttributeJavaCodeGenDelegator implements CodeGenDelegator {
 
@@ -32,6 +37,52 @@ public class AttributeJavaCodeGenDelegator implements CodeGenDelegator {
         String type = ctx.currentType;
         String name = attr.getName();
         String cap = capitalize(name);
+
+        List<PrimitiveConfig> primitiveConfigList = ((JavaMetaModelConfiguration) ((CodeGenVisitor) visitor).getMetaModelConfiguration()).getPrimitiveConfigs();
+        List<ModelConfig> modelConfigList = ((JavaMetaModelConfiguration) ((CodeGenVisitor) visitor).getMetaModelConfiguration()).getModelConfigs();
+        System.out.println(type);
+        StringBuilder importLine = new StringBuilder();
+        // recueillir les candidats de types à vérifier (type et types génériques si présents)
+        List<String> candidates = new java.util.ArrayList<>();
+        candidates.add(type);
+        if (type != null && type.contains("<") && type.contains(">")) {
+            String inner = type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'));
+            for (String t : inner.split(",")) {
+                candidates.add(t.trim());
+            }
+        }
+
+        for (PrimitiveConfig primitiveConfig : primitiveConfigList) {
+            String configName = primitiveConfig.getName();
+            String pkg = primitiveConfig.getPackageName();
+            if (pkg != null && !pkg.isEmpty()) {
+                for (String candidate : candidates) {
+                    if (candidate.contains(configName)) {
+                        String importStmt = "import " + pkg + "." + configName + ";" + System.lineSeparator();
+                        if (ctx.imports.indexOf(importStmt) == -1) {
+                            ctx.imports.append(importStmt);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        for (ModelConfig modelConfig : modelConfigList) {
+            String configName = modelConfig.getName();
+            String pkg = modelConfig.getPackageName();
+            if (pkg != null && !pkg.isEmpty()) {
+                for (String candidate : candidates) {
+                    if (candidate.contains(configName)) {
+                        String importStmt = "import " + pkg + "." + configName + ";" + System.lineSeparator();
+                        if (ctx.imports.indexOf(importStmt) == -1) {
+                            ctx.imports.append(importStmt);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
 
         // Génération du champ
         ctx.fields.append(

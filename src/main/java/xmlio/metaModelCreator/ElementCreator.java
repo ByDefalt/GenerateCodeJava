@@ -7,7 +7,7 @@ import org.w3c.dom.Element;
  * Interface pour la création d'éléments du métamodèle à partir d'éléments XML.
  * Utilise des génériques pour éviter les casts.
  */
-public interface ElementCreator<T extends MetaModelElement> {
+public interface ElementCreator<T extends MetaModelElement>{
     
     /**
      * Vérifie si ce créateur peut gérer l'élément XML donné

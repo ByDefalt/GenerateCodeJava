@@ -1,8 +1,10 @@
 package xmlio.metaModelCreator;
 
+import metaModel.MetaModelElement;
 import metaModel.minispec.Model;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -41,7 +43,7 @@ public class XMLAnalyser {
     /**
      * Charge un modèle à partir d'un flux d'entrée
      */
-    public Model getModelFromInputStream(InputStream stream) {
+    public MetaModelElement getModelFromInputStream(InputStream stream) {
         try {
             // Réinitialiser le contexte pour une nouvelle analyse
             context.reset();
@@ -66,17 +68,22 @@ public class XMLAnalyser {
     /**
      * Trouve et crée le modèle à partir de l'élément racine
      */
-    private Model findAndCreateModel(Element root) {
-        // Méthode 1 : Attribut "model" sur la racine
-        String modelId = root.getAttribute("model");
+    private MetaModelElement findAndCreateModel(Element root) {
+        String modelId = null;
+        if (root.getTagName().contains("-code")) {
+            modelId = root.getAttribute("id");
+        }
+        else{
+            modelId = root.getAttribute("model");
+        }
         if (!modelId.isEmpty()) {
-            return (Model) context.getOrCreateElement(modelId);
+            return context.getOrCreateElement(modelId);
         }
 
         // Méthode 2 : Chercher un élément Model dans l'index
         for (Element el : context.getXmlElementIndex().values()) {
             if ("Model".equals(el.getTagName())) {
-                return (Model) context.getOrCreateElement(el.getAttribute("id"));
+                return context.getOrCreateElement(el.getAttribute("id"));
             }
         }
         
@@ -86,14 +93,14 @@ public class XMLAnalyser {
     /**
      * Charge un modèle à partir d'une chaîne de caractères
      */
-    public Model getModelFromString(String content) {
+    public MetaModelElement getModelFromString(String content) {
         return getModelFromInputStream(new ByteArrayInputStream(content.getBytes()));
     }
     
     /**
      * Charge un modèle à partir d'un fichier
      */
-    public Model getModelFromFile(File file) {
+    public MetaModelElement getModelFromFile(File file) {
         try {
             return getModelFromInputStream(new FileInputStream(file));
         } catch (FileNotFoundException e) {
@@ -105,7 +112,7 @@ public class XMLAnalyser {
     /**
      * Charge un modèle à partir du nom d'un fichier
      */
-    public Model getModelFromFilenamed(String filename) {
+    public MetaModelElement getModelFromFilenamed(String filename) {
         return getModelFromFile(new File(filename));
     }
     

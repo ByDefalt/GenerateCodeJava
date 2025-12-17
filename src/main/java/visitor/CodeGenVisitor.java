@@ -14,7 +14,7 @@ public class CodeGenVisitor extends Visitor {
     private final CodeGenDelegator attributeCodeGenDelegator;
     private final CodeGenDelegator typeCodeGenDelegator;
     private final CodeGenDelegator collectionCodeGenDelegator;
-    private final MetaModelConfiguration metaModelConfiguration;
+    private MetaModelConfiguration metaModelConfiguration;
 
 
     public CodeGenVisitor(CodeGenDelegator modelCodeGenDelegator, CodeGenDelegator entityCodeGenDelegator, CodeGenDelegator attributeCodeGenDelegator, CodeGenDelegator typeCodeGenDelegator, CodeGenDelegator collectionCodeGenDelegator, MetaModelConfiguration metaModelConfiguration) {
@@ -76,6 +76,10 @@ public class CodeGenVisitor extends Visitor {
 
     public String getResult() {
         return ctx.result.toString();
+    }
+
+    public void setMetaModelConfiguration(MetaModelConfiguration metaModelConfiguration) {
+        this.metaModelConfiguration = metaModelConfiguration;
     }
 
     public MetaModelConfiguration getMetaModelConfiguration() {

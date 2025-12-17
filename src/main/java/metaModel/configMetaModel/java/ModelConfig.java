@@ -12,6 +12,12 @@ public class ModelConfig implements ConfigElement {
         this.name = name;
         this.packageName = packageName;
     }
+    @Override
+    public void accept(Visitor v) {
+
+    }
+
+
 
     public String getName() {
         return name;
@@ -21,8 +27,12 @@ public class ModelConfig implements ConfigElement {
         return packageName;
     }
 
-    @Override
-    public void accept(Visitor v) {
 
+    @Override
+    public String toString() {
+        return "ModelConfig{" +
+                "name='" + name + '\'' +
+                ", packageName='" + packageName + '\'' +
+                '}';
     }
 }

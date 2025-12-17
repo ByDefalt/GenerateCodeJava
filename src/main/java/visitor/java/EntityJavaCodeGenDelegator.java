@@ -1,11 +1,16 @@
 package visitor.java;
 
+import metaModel.configMetaModel.java.JavaMetaModelConfiguration;
+import metaModel.configMetaModel.java.ModelConfig;
+import metaModel.configMetaModel.java.PrimitiveConfig;
 import metaModel.minispec.Attribute;
 import metaModel.minispec.Entity;
 import visitor.CodeGenDelegator;
 import visitor.CodeGenVisitor;
 import visitor.Context;
 import visitor.Visitor;
+
+import java.util.List;
 
 public class EntityJavaCodeGenDelegator implements CodeGenDelegator {
 
@@ -17,12 +22,33 @@ public class EntityJavaCodeGenDelegator implements CodeGenDelegator {
 
         ctx.fields.setLength(0);
         ctx.methods.setLength(0);
+        ctx.imports.setLength(0);
 
         StringBuilder classBuf = new StringBuilder();
-        classBuf.append("public class ").append(e.getName());
+
+
+        classBuf.append("\npublic class ").append(e.getName());
 
         if (e.getSuperEntity() != null) {
             classBuf.append(" extends ").append(e.getSuperEntity().getName());
+        }
+        StringBuilder importLine = new StringBuilder();
+        List<ModelConfig> modelConfigList = ((JavaMetaModelConfiguration) ((CodeGenVisitor) visitor).getMetaModelConfiguration()).getModelConfigs();
+        if (e.getSuperEntity() != null) {
+            String superName = e.getSuperEntity().getName();
+            if (superName != null) {
+                for (ModelConfig modelConfig : modelConfigList) {
+                    if (superName.contains(modelConfig.getName())) {
+                        String pkg = modelConfig.getPackageName();
+                        if (pkg != null && !pkg.isEmpty()) {
+                            String importStmt = "import " + pkg + "." + modelConfig.getName() + ";" + System.lineSeparator();
+                            if (ctx.imports.indexOf(importStmt) == -1) {
+                                ctx.imports.append(importStmt);
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         classBuf.append(" {\n");
@@ -37,6 +63,8 @@ public class EntityJavaCodeGenDelegator implements CodeGenDelegator {
         classBuf.append(ctx.methods);
         classBuf.append("}\n\n");
 
+        ctx.result.append(ctx.packageName);
+        ctx.result.append(ctx.imports);
         ctx.result.append(classBuf);
 
     }
