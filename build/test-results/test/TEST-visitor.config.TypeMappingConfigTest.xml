@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="visitor.config.TypeMappingConfigTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2025-12-17T12:43:59" hostname="defalt" time="0.093">
+  <properties/>
+  <testcase name="testLoadFromXml()" classname="visitor.config.TypeMappingConfigTest" time="0.054"/>
+  <testcase name="testPrintConfiguration()" classname="visitor.config.TypeMappingConfigTest" time="0.033"/>
+  <testcase name="testDefaultMappings()" classname="visitor.config.TypeMappingConfigTest" time="0.003"/>
+  <testcase name="testAddMapping()" classname="visitor.config.TypeMappingConfigTest" time="0.001"/>
+  <system-out><![CDATA[=== Configuration des mappings de types ===
+Package par défaut: java.util
+Mappings:
+  LocalDateTime -> LocalDateTime (imports: [java.time.LocalDateTime])
+  Set -> Set (imports: [java.util.Set])
+  double -> double
+  String -> String
+  float -> float
+  Double -> Double
+  LocalDate -> LocalDate (imports: [java.time.LocalDate])
+  int -> int
+  long -> long
+  Date -> Date (imports: [java.util.Date])
+  BigDecimal -> BigDecimal (imports: [java.math.BigDecimal])
+  Integer -> Integer
+  Float -> Float
+  boolean -> boolean
+  Long -> Long
+  List -> List (imports: [java.util.List])
+  Boolean -> Boolean
+  Map -> Map (imports: [java.util.Map])
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

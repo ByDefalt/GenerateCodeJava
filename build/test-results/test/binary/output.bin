@@ -1,15 +1,22 @@
-model SpaceMissionHybrid ;
-
-entity Satellite ;
-    id : Integer ;
-    parent_flotte : Flotte ;
-end entity;
-
-'entity Flotte subtype of (Satellite) ;
-    nom : String ;
-*    satellites : Bag [0:*] of Satellite ;
-end entity;
-
-
-end model
-
+,=== Configuration des mappings de types ===
+Package par défaut: java.util
+
+Mappings:
+F  LocalDateTime -> LocalDateTime (imports: [java.time.LocalDateTime])
+(  Set -> Set (imports: [java.util.Set])
+  double -> double
+  String -> String
+  float -> float
+  Double -> Double
+:  LocalDate -> LocalDate (imports: [java.time.LocalDate])
+  int -> int
+  long -> long
++  Date -> Date (imports: [java.util.Date])
+=  BigDecimal -> BigDecimal (imports: [java.math.BigDecimal])
+  Integer -> Integer
+  Float -> Float
+  boolean -> boolean
+  Long -> Long
++  List -> List (imports: [java.util.List])
+  Boolean -> Boolean
+(  Map -> Map (imports: [java.util.Map])
