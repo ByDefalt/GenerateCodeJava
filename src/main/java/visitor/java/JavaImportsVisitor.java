@@ -13,9 +13,9 @@ import java.util.regex.Pattern;
 /**
  * Décorateur qui ajoute la gestion des imports au JavaVisitor existant.
  * Évite la duplication de code en réutilisant JavaVisitor (Decorator Pattern).
- * 
+ *
  * Utilise maintenant un système de configuration XML pour les mappings de types.
- * 
+ *
  * Usage:
  * TypeMappingConfig config = new TypeMappingConfig();
  * config.loadFromXml("config/type-mapping.xml");
@@ -26,11 +26,11 @@ import java.util.regex.Pattern;
  * String code = visitor.getResult();
  */
 public class JavaImportsVisitor extends Visitor {
-    
+
     private final CodeGenVisitor delegate;
     private final ImportCollectorRegistry importRegistry;
     private final Map<String, Set<String>> entityImports; // entityName -> imports
-    
+
     /**
      * Constructeur avec visiteur délégué et registry personnalisé
      */
@@ -39,21 +39,21 @@ public class JavaImportsVisitor extends Visitor {
         this.importRegistry = importRegistry;
         this.entityImports = new HashMap<>();
     }
-    
+
     /**
      * Constructeur avec visiteur délégué et registry par défaut
      */
     public JavaImportsVisitor(CodeGenVisitor delegate) {
         this(delegate, new ImportCollectorRegistry());
     }
-    
+
     /**
      * Constructeur par défaut
      */
     public JavaImportsVisitor() {
         this(new JavaVisitor());
     }
-    
+
     public ImportCollectorRegistry getImportRegistry() {
         return importRegistry;
     }
@@ -74,7 +74,7 @@ public class JavaImportsVisitor extends Visitor {
             }
         }
         entityImports.put(e.getName(), imports);
-        delegate.getContext().result.append(imports);
+
         delegate.visitEntity(e);
     }
 
@@ -121,7 +121,7 @@ public class JavaImportsVisitor extends Visitor {
     public String getResult() {
         return injectImports(delegate.getResult());
     }
-    
+
     /**
      * Injecte les imports dans le code généré par le délégué
      */
@@ -129,21 +129,21 @@ public class JavaImportsVisitor extends Visitor {
         if (entityImports.isEmpty()) {
             return generatedCode;
         }
-        
+
         StringBuilder result = new StringBuilder();
         String[] classes = generatedCode.split("(?=public class )");
-        
+
         for (String classCode : classes) {
             if (classCode.trim().isEmpty()) continue;
-            
+
             // Extraire le nom de la classe
             Pattern pattern = Pattern.compile("public class (\\w+)");
             Matcher matcher = pattern.matcher(classCode);
-            
+
             if (matcher.find()) {
                 String className = matcher.group(1);
                 Set<String> imports = entityImports.get(className);
-                
+
                 if (imports != null && !imports.isEmpty()) {
                     // Ajouter les imports avant la déclaration de classe
                     for (String importStr : imports) {
@@ -152,10 +152,10 @@ public class JavaImportsVisitor extends Visitor {
                     result.append("\n");
                 }
             }
-            
+
             result.append(classCode);
         }
-        
+
         return result.toString();
     }
 }
