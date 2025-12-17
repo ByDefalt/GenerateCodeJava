@@ -6,11 +6,24 @@ import visitor.Visitor;
 public class Attribute implements MinispecElement {
     private final String name;
     private final Type type;
+    private final String initialValue;
 
 
-    public Attribute(String name, Type type) {
+    public Attribute(String name, Type type, String initialValue) {
         this.name = name;
         this.type = type;
+        this.initialValue = initialValue;
+    }
+
+    public Attribute(String name, Type type) {
+
+        this.name = name;
+        this.type = type;
+        this.initialValue = null;
+    }
+
+    public String getInitialValue() {
+        return initialValue;
     }
 
     public String getName() {

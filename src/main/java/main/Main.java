@@ -1,7 +1,6 @@
 package main;
 
-import metaModel.configMetaModel.java.JavaMetaModelConfiguration;
-import metaModel.configMetaModel.java.ModelConfig;
+import visitor.java.JavaMetaModelConfiguration;
 import metaModel.minispec.Model;
 import prettyPrinter.PrettyPrinter;
 import visitor.CodeGenVisitor;

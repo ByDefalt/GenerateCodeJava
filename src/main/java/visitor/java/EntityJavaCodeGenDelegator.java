@@ -1,8 +1,6 @@
 package visitor.java;
 
-import metaModel.configMetaModel.java.JavaMetaModelConfiguration;
 import metaModel.configMetaModel.java.ModelConfig;
-import metaModel.configMetaModel.java.PrimitiveConfig;
 import metaModel.minispec.Attribute;
 import metaModel.minispec.Entity;
 import visitor.CodeGenDelegator;
@@ -32,7 +30,6 @@ public class EntityJavaCodeGenDelegator implements CodeGenDelegator {
         if (e.getSuperEntity() != null) {
             classBuf.append(" extends ").append(e.getSuperEntity().getName());
         }
-        StringBuilder importLine = new StringBuilder();
         List<ModelConfig> modelConfigList = ((JavaMetaModelConfiguration) ((CodeGenVisitor) visitor).getMetaModelConfiguration()).getModelConfigs();
         if (e.getSuperEntity() != null) {
             String superName = e.getSuperEntity().getName();

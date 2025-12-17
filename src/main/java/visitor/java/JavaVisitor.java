@@ -1,6 +1,5 @@
 package visitor.java;
 
-import metaModel.configMetaModel.java.JavaMetaModelConfiguration;
 import metaModel.minispec.types.*;
 import visitor.CodeGenVisitor;
 

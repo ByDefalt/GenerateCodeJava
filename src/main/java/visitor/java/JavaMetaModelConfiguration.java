@@ -1,7 +1,9 @@
-package metaModel.configMetaModel.java;
+package visitor.java;
 
 import metaModel.configMetaModel.ConfigElement;
 import metaModel.configMetaModel.MetaModelConfiguration;
+import metaModel.configMetaModel.java.ModelConfig;
+import metaModel.configMetaModel.java.PrimitiveConfig;
 import visitor.Visitor;
 
 import java.util.ArrayList;

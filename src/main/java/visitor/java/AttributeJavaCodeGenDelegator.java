@@ -1,6 +1,5 @@
 package visitor.java;
 
-import metaModel.configMetaModel.java.JavaMetaModelConfiguration;
 import metaModel.configMetaModel.java.ModelConfig;
 import metaModel.configMetaModel.java.PrimitiveConfig;
 import metaModel.minispec.Attribute;
@@ -40,9 +39,7 @@ public class AttributeJavaCodeGenDelegator implements CodeGenDelegator {
 
         List<PrimitiveConfig> primitiveConfigList = ((JavaMetaModelConfiguration) ((CodeGenVisitor) visitor).getMetaModelConfiguration()).getPrimitiveConfigs();
         List<ModelConfig> modelConfigList = ((JavaMetaModelConfiguration) ((CodeGenVisitor) visitor).getMetaModelConfiguration()).getModelConfigs();
-        System.out.println(type);
-        StringBuilder importLine = new StringBuilder();
-        // recueillir les candidats de types à vérifier (type et types génériques si présents)
+
         List<String> candidates = new java.util.ArrayList<>();
         candidates.add(type);
         if (type != null && type.contains("<") && type.contains(">")) {

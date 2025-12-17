@@ -1,11 +1,9 @@
 package xmlio.metaModelCreator.ConfigSpec;
 
 import metaModel.MetaModelElement;
-import metaModel.configMetaModel.java.JavaMetaModelConfiguration;
+import visitor.java.JavaMetaModelConfiguration;
 import metaModel.configMetaModel.java.ModelConfig;
 import metaModel.configMetaModel.java.PrimitiveConfig;
-import metaModel.minispec.Entity;
-import metaModel.minispec.MinispecElement;
 import org.w3c.dom.Element;
 import xmlio.metaModelCreator.CreationContext;
 import xmlio.metaModelCreator.ElementCreator;
