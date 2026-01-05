@@ -55,9 +55,10 @@ public class PrettyPrinter extends Visitor {
         // Visiter le type pour obtenir sa représentation
         currentTypeString = "";
         e.getType().accept(this);
-
         result = result + "    " + e.getName() + " : " + currentTypeString;
-
+        if(e.getInitialValue()!=null) {
+             result = result + " := " + e.getInitialValue();
+        }
         result = result + " ;\n";
     }
 

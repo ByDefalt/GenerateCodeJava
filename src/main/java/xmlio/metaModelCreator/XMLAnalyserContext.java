@@ -4,6 +4,7 @@ import metaModel.MetaModelElement;
 import metaModel.minispec.MinispecElement;
 import org.w3c.dom.Element;
 import xmlio.metaModelCreator.minispec.CircularDependencyDetector;
+import xmlio.metaModelCreator.minispec.DoubleNameExtendsDetector;
 import xmlio.metaModelCreator.minispec.TypeResolver;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ public class XMLAnalyserContext implements CreationContext {
     private final CircularDependencyDetector cycleDetector;
     private final TypeResolver typeResolver;
     private final ElementCreatorRegistry creatorRegistry;
+    private final DoubleNameExtendsDetector doubleNameExtendsDetector;
     
     public XMLAnalyserContext() {
         this.minispecIndex = new HashMap<>();
@@ -28,6 +30,7 @@ public class XMLAnalyserContext implements CreationContext {
         this.cycleDetector = new CircularDependencyDetector();
         this.typeResolver = new TypeResolver(this);
         this.creatorRegistry = new ElementCreatorRegistry();
+        this.doubleNameExtendsDetector = new DoubleNameExtendsDetector();
     }
     
     @Override

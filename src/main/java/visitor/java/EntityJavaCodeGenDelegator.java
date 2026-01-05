@@ -48,14 +48,25 @@ public class EntityJavaCodeGenDelegator implements CodeGenDelegator {
             }
         }
 
-        classBuf.append(" {\n");
 
         if (e.getAttributes() != null) {
             for (Attribute a : e.getAttributes()) {
                 a.accept(visitor);
             }
         }
+        boolean allreadyImplemented = false;
+        for(Attribute a : e.getAttributes()) {
+            if(a.getInitialValue()!=null){
+                if(allreadyImplemented) {
+                    classBuf.append(" , ").append(a.getInitialValue().split("\\(")[0]).append("Methods ");
+                }else{
+                    classBuf.append(" implements ").append(a.getInitialValue().split("\\(")[0]).append("Methods ");
+                    allreadyImplemented=true;
+                }
+            }
+        }
 
+        classBuf.append(" {\n");
         classBuf.append(ctx.fields);
         classBuf.append(ctx.methods);
         classBuf.append("}\n\n");
