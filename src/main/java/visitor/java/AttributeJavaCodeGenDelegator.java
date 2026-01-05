@@ -16,6 +16,9 @@ public class AttributeJavaCodeGenDelegator implements CodeGenDelegator {
     private static final String FIELD_TEMPLATE =
             "    private $Type $VarName;\n";
 
+    private static final String FIELD_WITH_INIT_TEMPLATE =
+            "    private $Type $VarName = $InitValue;\n";
+
     private static final String GETTER_TEMPLATE =
             "\n    public $Type get$CapVarName() {\n" +
                     "        return $VarName;\n" +
@@ -81,12 +84,22 @@ public class AttributeJavaCodeGenDelegator implements CodeGenDelegator {
             }
         }
 
-        // Génération du champ
-        ctx.fields.append(
-                FIELD_TEMPLATE
-                        .replace("$Type", type)
-                        .replace("$VarName", name)
-        );
+        if(attr.getInitialValue() != null) {
+            // Génération du champ avec valeur initiale
+            ctx.fields.append(
+                    FIELD_WITH_INIT_TEMPLATE
+                            .replace("$Type", type)
+                            .replace("$VarName", name)
+                            .replace("$InitValue", attr.getInitialValue())
+            );
+        } else {
+            // Génération du champ
+            ctx.fields.append(
+                    FIELD_TEMPLATE
+                            .replace("$Type", type)
+                            .replace("$VarName", name)
+            );
+        }
 
         // Génération getter
         ctx.methods.append(

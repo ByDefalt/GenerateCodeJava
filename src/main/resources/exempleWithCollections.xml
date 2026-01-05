@@ -20,6 +20,6 @@
     <Entity id="#5" model="#1" name="Satellite" />
     <Attribute id="#6" entity="#5" name="id" type="Integer" />
 
-    <Attribute id="#7" entity="#5" name="parent_flotte" type="#17" />
+    <Attribute id="#7" entity="#5" name="parent_flotte" type="#17" init="nextId()"/>
 
 </Root>
