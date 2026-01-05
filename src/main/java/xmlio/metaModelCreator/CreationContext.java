@@ -3,6 +3,7 @@ package xmlio.metaModelCreator;
 import metaModel.MetaModelElement;
 import metaModel.minispec.MinispecElement;
 import org.w3c.dom.Element;
+import xmlio.metaModelCreator.minispec.DoubleNameExtendsDetector;
 import xmlio.metaModelCreator.minispec.TypeResolver;
 
 import java.util.List;
@@ -47,4 +48,6 @@ public interface CreationContext {
      * Trouve tous les éléments XML enfants du contexte courant
      */
     List<Element> findChildElements(String parenTagName);
+
+    DoubleNameExtendsDetector getDoubleNameDetector();
 }

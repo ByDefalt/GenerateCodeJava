@@ -10,17 +10,18 @@ import xmlio.metaModelCreator.ElementCreator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Créateur spécialisé pour les éléments Entity
  */
 public class EntityCreator implements ElementCreator<Entity> {
-    
+
     @Override
     public boolean canHandle(Element xmlElement) {
         return "Entity".equals(xmlElement.getTagName());
     }
-    
+
     @Override
     public Entity create(Element xmlElement, CreationContext context) {
         String name = xmlElement.getAttribute("name");
@@ -34,29 +35,42 @@ public class EntityCreator implements ElementCreator<Entity> {
                 if (parentObj != null) {
                     superEntity = (Entity) parentObj;
                 } else {
-                    context.reportError("Impossible de résoudre l'héritage pour '" + name 
+                    context.reportError("Impossible de résoudre l'héritage pour '" + name
                             + "'. (ID inexistant ou cycle détecté sur " + extendId + ")");
                 }
             } else {
-                context.reportError("Attribut 'extend' invalide pour l'entité '" + name 
+                context.reportError("Attribut 'extend' invalide pour l'entité '" + name
                         + "'. Doit être un ID (#...), reçu : " + extendId);
             }
         }
 
         return new Entity(name, superEntity, new ArrayList<>());
     }
-    
+
     @Override
     public void fillDetails(Entity entity, Element xmlElement, CreationContext context) {
         String entityId = xmlElement.getAttribute("id");
-        
+
         List<Element> childElements = context.findChildElements(entityId, "Attribute", "entity");
-        
+
         for (Element childEl : childElements) {
             String childId = childEl.getAttribute("id");
             MetaModelElement attr = context.getOrCreateElement(childId);
             if (attr != null) {
                 entity.getAttributes().add((Attribute) attr);
+            }
+        }
+
+        // Vérification des conflits de noms d'attributs après avoir rempli tous les attributs
+        if (entity.getSuperEntity() != null && !context.getDoubleNameDetector().checkEntity(entity)) {
+            Set<String> conflicts = context.getDoubleNameDetector().findConflictingAttributes(entity);
+            for (String attrName : conflicts) {
+                String parentName = context.getDoubleNameDetector().findParentWithAttribute(entity, attrName);
+                String hierarchy = context.getDoubleNameDetector().getHierarchyPath(entity);
+                context.reportError("CONFLIT D'ATTRIBUT DÉTECTÉ : L'entité '" + entity.getName()
+                        + "' définit l'attribut '" + attrName
+                        + "' qui existe déjà dans la classe parente '" + parentName
+                        + "'. Hiérarchie: " + hierarchy);
             }
         }
     }
