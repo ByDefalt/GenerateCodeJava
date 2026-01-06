@@ -17,4 +17,5 @@ public class SimpleType extends Type {
     public void accept(Visitor v) {
         v.visitSimpleType(this);
     }
+
 }

@@ -18,4 +18,5 @@ public class ArrayType extends CollectionType {
     public void accept(Visitor v) {
         v.visitArrayType(this);
     }
+
 }

@@ -55,8 +55,8 @@ public class EntityJavaCodeGenDelegator implements CodeGenDelegator {
             }
         }
         boolean allreadyImplemented = false;
-        for(Attribute a : e.getAttributes()) {
-            if(a.getInitialValue()!=null){
+        for(Attribute a : e.getAttributes()){
+            if(a.getInitialValue()!=null && a.getInitialValue().contains("(")) {
                 if(allreadyImplemented) {
                     classBuf.append(" , ").append(a.getInitialValue().split("\\(")[0]).append("Methods ");
                 }else{

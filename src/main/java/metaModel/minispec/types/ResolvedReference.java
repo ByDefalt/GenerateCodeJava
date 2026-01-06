@@ -20,4 +20,5 @@ public class ResolvedReference extends ReferenceType{
     public void accept(Visitor v) {
         v.visitResolvedReference(this);
     }
+
 }

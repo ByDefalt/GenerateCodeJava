@@ -16,4 +16,5 @@ public class ListType extends CollectionType {
     public void accept(Visitor v) {
         v.visitListType(this);
     }
+
 }

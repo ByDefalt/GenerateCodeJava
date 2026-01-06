@@ -11,4 +11,5 @@
     <primitive id="#7" name="Array" type="Array" package="m2tiil.Array" code="#1"/>
     <primitive id="#8" name="Set" type="HashSet" package="java.util.HashSet" code="#1"/>
     <primitive id="#9" name="Bag" type="Bag" package="m2tiil.Bag" code="#1"/>
+
 </java-code>

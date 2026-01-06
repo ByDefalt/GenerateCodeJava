@@ -16,7 +16,6 @@
 
     <Attribute id="#4" entity="#2" name="satellites" type="#13" />
 
-
     <Entity id="#5" model="#1" name="Satellite" />
     <Attribute id="#6" entity="#5" name="id" type="Integer" />
 

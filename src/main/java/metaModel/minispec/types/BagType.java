@@ -16,4 +16,5 @@ public class BagType extends CollectionType {
     public void accept(Visitor v) {
         v.visitBagType(this);
     }
+
 }

@@ -22,7 +22,6 @@ public class AttributeCreator implements ElementCreator<Attribute> {
         Type type = context.getTypeResolver().resolveType(xmlElement.getAttribute("type"));
         String initialValue = xmlElement.getAttribute("init");
         if(!initialValue.isEmpty()) {
-            System.out.println("Initial value set for attribute: " + name + " : " + initialValue);
             return new Attribute(name, type, initialValue);
         }
         return new Attribute(name, type);
